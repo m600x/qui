@@ -66,42 +66,52 @@ func (sm *SyncManager) zenCategoryValues(ctx context.Context, instanceID int) ma
 // duration, plus the seeders and size bonus. ok is false for a torrent that has
 // not seeded yet, which has no score.
 func ZenScore(t *qbt.Torrent, categoryValues map[string]float64) (score float64, ok bool) {
-	if t.SeedingTime <= 0 {
+	base, duration, swarm, ok := zenScoreParts(t, categoryValues)
+	if !ok {
 		return 0, false
 	}
+	// Drop the float noise of the sum, as in 1 + 0.1 + 0.35.
+	return math.Round((base+duration+swarm)*100) / 100, true
+}
 
-	score = zenDefaultCategoryValue
+// zenScoreParts splits the Zen Score into the category value, the seeding
+// duration bonus and the seeders and size bonus. ok is false for a torrent
+// that has not seeded yet.
+func zenScoreParts(t *qbt.Torrent, categoryValues map[string]float64) (base, duration, swarm float64, ok bool) {
+	if t.SeedingTime <= 0 {
+		return 0, 0, 0, false
+	}
+
+	base = zenDefaultCategoryValue
 	if v, found := categoryValues[t.Category]; found {
-		score = v
+		base = v
 	}
 
 	switch days := t.SeedingTime / secondsPerDay; {
 	case days >= 180:
-		score += 0.5
+		duration = 0.5
 	case days >= 90:
-		score += 0.35
+		duration = 0.35
 	case days >= 30:
-		score += 0.25
+		duration = 0.25
 	case days >= 7:
-		score += 0.1
+		duration = 0.1
 	}
 
 	switch seeders := t.NumComplete; {
 	case seeders >= 41 && seeders <= 200:
 		switch {
 		case t.Size < bytesPerGB:
-			score += 0.2
+			swarm = 0.2
 		case t.Size <= 50*bytesPerGB:
-			score += 0.35
+			swarm = 0.35
 		default:
-			score += 0.5
+			swarm = 0.5
 		}
 	case seeders >= 201 && seeders <= 250:
-		score += 0.35
+		swarm = 0.35
 	}
-
-	// Drop the float noise of the sum, as in 1 + 0.1 + 0.35.
-	return math.Round(score*100) / 100, true
+	return base, duration, swarm, true
 }
 
 const (
@@ -206,12 +216,14 @@ func (sm *SyncManager) addZenScoreStats(ctx context.Context, instanceID int, sta
 		if categoryValues == nil {
 			categoryValues = sm.zenCategoryValues(ctx, instanceID)
 		}
-		if score, ok := ZenScore(t, categoryValues); ok {
+		if base, duration, swarm, ok := zenScoreParts(t, categoryValues); ok {
+			score := math.Round((base+duration+swarm)*100) / 100
 			coef := ZenCoef(t.Size)
 			stats.ZenScoreSum += score
 			stats.ZenCoefSum += coef
 			stats.ZenScoreCoefSum += score * coef
 			stats.ZenScoreCount++
+			stats.addZenDistribution(t, score, coef, base, duration, swarm)
 		}
 	}
 }

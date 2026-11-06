@@ -101,6 +101,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 
 import { DashboardSettingsDialog } from "@/components/dashboard-settings-dialog"
+import { ZenCharts } from "@/components/dashboard/ZenCharts"
 import { createStreamKey, useSyncStreamManager, type StreamState } from "@/contexts/SyncStreamContext"
 import { DEFAULT_DASHBOARD_SETTINGS, useDashboardSettings, useUpdateDashboardSettings } from "@/hooks/useDashboardSettings"
 import { useCreateTrackerCustomization, useDeleteTrackerCustomization, useTrackerCustomizations, useUpdateTrackerCustomization } from "@/hooks/useTrackerCustomizations"
@@ -3161,6 +3162,7 @@ export function Dashboard() {
   // poll transfer info for title bar speeds.
   const statsData = useAllInstanceStats(activeInstances, { enabled: !isHiddenDelayed })
   const globalStats = useGlobalStats(statsData)
+  const zenStats = useMemo(() => statsData.map(({ stats }) => stats), [statsData])
   const transferInfoQueries = useQueries({
     queries: activeInstances.map(instance => ({
       queryKey: ["transfer-info", instance.id],
@@ -3306,6 +3308,7 @@ export function Dashboard() {
                         <div className="hidden sm:grid gap-4 sm:grid-cols-2 lg:grid-cols-4 2xl:grid-cols-7">
                           <GlobalStatsCards globalStats={globalStats} />
                         </div>
+                        <ZenCharts stats={zenStats} />
                       </div>
                     )
                   case "instances":

@@ -179,6 +179,18 @@ export interface TorrentStats {
   // The sum of each seeded torrent's Zen Score times its own Zen coefficient.
   zenScoreCoefSum?: number
   zenScoreCount?: number
+  // The parts of the Zen Scores, and their distributions bucketed at the edges in lib/zen-score-charts.ts.
+  zenBaseSum?: number
+  zenDurationSum?: number
+  zenSwarmSum?: number
+  zenScoreHist?: number[]
+  zenCoefHist?: number[]
+  zenProductHist?: number[]
+  zenProductHistSum?: number[]
+  zenAgeBands?: number[]
+  zenSwarmBands?: number[]
+  zenSizeBands?: number[]
+  zenSizeBandPoints?: number[]
 }
 
 export interface CacheMetadata {

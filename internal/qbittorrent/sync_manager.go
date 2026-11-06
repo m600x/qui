@@ -387,6 +387,24 @@ type TorrentStats struct {
 	ZenCoefSum      float64 `json:"zenCoefSum,omitempty"`
 	ZenScoreCoefSum float64 `json:"zenScoreCoefSum,omitempty"`
 	ZenScoreCount   int     `json:"zenScoreCount,omitempty"`
+
+	// The parts of the Zen Scores: category value, seeding duration bonus, and seeders and size bonus.
+	ZenBaseSum     float64 `json:"zenBaseSum,omitempty"`
+	ZenDurationSum float64 `json:"zenDurationSum,omitempty"`
+	ZenSwarmSum    float64 `json:"zenSwarmSum,omitempty"`
+
+	// Distributions of the same torrents, bucketed at the edges in zen_stats.go.
+	// The product lists hold the Zen Score times the coefficient: its histogram
+	// counts and its sum per bucket. The size lists hold the count and the
+	// product sum per size band.
+	ZenScoreHist      []int     `json:"zenScoreHist,omitempty"`
+	ZenCoefHist       []int     `json:"zenCoefHist,omitempty"`
+	ZenProductHist    []int     `json:"zenProductHist,omitempty"`
+	ZenProductHistSum []float64 `json:"zenProductHistSum,omitempty"`
+	ZenAgeBands       []int     `json:"zenAgeBands,omitempty"`
+	ZenSwarmBands     []int     `json:"zenSwarmBands,omitempty"`
+	ZenSizeBands      []int     `json:"zenSizeBands,omitempty"`
+	ZenSizeBandPoints []float64 `json:"zenSizeBandPoints,omitempty"`
 }
 
 // DuplicateTorrentMatch represents an existing torrent that matches one or more requested hashes.
@@ -2063,6 +2081,7 @@ func mergeTorrentStats(base *TorrentStats, next *TorrentStats) *TorrentStats {
 	base.ZenCoefSum += next.ZenCoefSum
 	base.ZenScoreCoefSum += next.ZenScoreCoefSum
 	base.ZenScoreCount += next.ZenScoreCount
+	mergeZenDistribution(base, next)
 
 	return base
 }

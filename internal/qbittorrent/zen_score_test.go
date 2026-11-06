@@ -188,6 +188,55 @@ func TestApplyZenFilters(t *testing.T) {
 	assert.True(t, FilterOptions{}.IsEmpty())
 }
 
+func TestZenDistribution(t *testing.T) {
+	t.Parallel()
+
+	assert.Equal(t, 0, zenBucket(0.1, zenScoreEdges))
+	assert.Equal(t, 5, zenBucket(0.9, zenScoreEdges))
+	assert.Equal(t, 6, zenBucket(1.0, zenScoreEdges))
+	assert.Equal(t, 7, zenBucket(1.1, zenScoreEdges))
+	assert.Equal(t, len(zenScoreEdges), zenBucket(2.0, zenScoreEdges))
+
+	const day = int64(secondsPerDay)
+	const gb = int64(1_000_000_000)
+	build := func(torrents ...qbt.Torrent) *TorrentStats {
+		stats := &TorrentStats{}
+		sm := &SyncManager{}
+		for i := range torrents {
+			torrents[i].Tracker = "https://t.c411.org/announce"
+		}
+		sm.addZenScoreStats(context.Background(), 1, stats, torrents)
+		return stats
+	}
+
+	// 50 MB, 10 days, 100 seeders: score 1 + 0.1 + 0.2 = 1.3.
+	small := qbt.Torrent{Size: 50_000_000, SeedingTime: 10 * day, NumComplete: 100}
+	// 30 GB, 200 days, 300 seeders: score 1 + 0.5 + 0 = 1.5.
+	big := qbt.Torrent{Size: 30 * gb, SeedingTime: 200 * day, NumComplete: 300}
+
+	stats := build(small, big)
+	assert.Equal(t, 2, stats.ZenScoreCount)
+	assert.Equal(t, 1, stats.ZenScoreHist[zenBucket(1.3, zenScoreEdges)])
+	assert.Equal(t, 1, stats.ZenScoreHist[zenBucket(1.5, zenScoreEdges)])
+	assert.Equal(t, []int{0, 1, 0, 0, 0, 1}, stats.ZenSizeBands)
+	assert.Equal(t, []int{0, 1, 0, 0, 1}, stats.ZenAgeBands)
+	assert.Equal(t, []int{0, 1, 0, 1}, stats.ZenSwarmBands)
+	assert.InDelta(t, 2.0, stats.ZenBaseSum, 1e-9)
+	assert.InDelta(t, 0.6, stats.ZenDurationSum, 1e-9)
+	assert.InDelta(t, 0.2, stats.ZenSwarmSum, 1e-9)
+	assert.InDelta(t, stats.ZenScoreCoefSum, stats.ZenProductHistSum[zenBucket(1.3*ZenCoef(50_000_000), zenProductEdges)]+
+		stats.ZenProductHistSum[zenBucket(1.5*ZenCoef(30*gb), zenProductEdges)], 1e-9)
+
+	// Merging adds into a new list and leaves both inputs as they were.
+	other := build(small)
+	merged := &TorrentStats{}
+	mergeZenDistribution(merged, stats)
+	mergeZenDistribution(merged, other)
+	assert.Equal(t, []int{0, 2, 0, 0, 1}, merged.ZenAgeBands)
+	assert.Equal(t, []int{0, 1, 0, 0, 1}, stats.ZenAgeBands)
+	assert.Equal(t, []int{0, 1, 0, 0, 0}, other.ZenAgeBands)
+}
+
 func TestSortTorrentsByZenScore(t *testing.T) {
 	t.Parallel()
 
