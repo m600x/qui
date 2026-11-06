@@ -128,7 +128,6 @@ export function RssTab({ settings }: { settings: CrossSeedAutomationSettings }) 
     patchSettings.mutate({ ...form })
   }
 
-  const latestRun: CrossSeedRun | null | undefined = status?.lastRun
   const automationRunning = status?.running ?? false
   const hasTargets = form.targetInstanceIds.length > 0
 
