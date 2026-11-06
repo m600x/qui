@@ -1482,6 +1482,7 @@
     "seedingTime": "做种时间",
     "zenScore": "Zen Score",
     "zenCoef": "Zen coef",
+    "zenScoreCoef": "Zen Score × coef",
     "savePath": "保存路径",
     "completed": "已完成",
     "ratioLimit": "分享率限制",

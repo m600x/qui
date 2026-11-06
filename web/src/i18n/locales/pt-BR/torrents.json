@@ -1572,6 +1572,7 @@
     "seedingTime": "Tempo Seed",
     "zenScore": "Zen Score",
     "zenCoef": "Zen coef",
+    "zenScoreCoef": "Zen Score × coef",
     "savePath": "Caminho de Salvamento",
     "completed": "Concluído",
     "ratioLimit": "Lim. Ratio",

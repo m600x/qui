@@ -1693,8 +1693,8 @@ func (sm *SyncManager) GetTorrentsWithFilters(ctx context.Context, instanceID in
 
 	summary := SummaryRequested(ctx)
 	if sort != "" && !summary {
-		if sort == ZenScoreColumn {
-			sm.sortTorrentsByZenScore(ctx, instanceID, filteredTorrents, order == "desc")
+		if IsZenSortColumn(sort) {
+			sm.sortTorrentsByZenScore(ctx, sort, instanceID, filteredTorrents, order == "desc")
 		} else {
 			sm.sortTorrents(filteredTorrents, sort, order == "desc", trackerHealthSupported, cachedHealth)
 		}
@@ -1987,8 +1987,8 @@ func (sm *SyncManager) GetCrossInstanceTorrentsWithFilters(ctx context.Context, 
 	}
 
 	// An empty sort column sorts by name, as an unknown column does.
-	if sort == ZenScoreColumn {
-		sm.sortCrossInstanceByZenScore(ctx, allTorrents, order == "desc")
+	if IsZenSortColumn(sort) {
+		sm.sortCrossInstanceByZenScore(ctx, sort, allTorrents, order == "desc")
 	} else {
 		sm.sortCrossInstanceTorrents(allTorrents, sort, order == "desc")
 	}

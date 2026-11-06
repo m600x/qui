@@ -1572,6 +1572,7 @@
     "seedingTime": "Seeding-Zeit",
     "zenScore": "Zen Score",
     "zenCoef": "Zen coef",
+    "zenScoreCoef": "Zen Score × coef",
     "savePath": "Speicherpfad",
     "completed": "Abgeschlossen",
     "ratioLimit": "Ratio-Limit",

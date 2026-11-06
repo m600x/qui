@@ -17,6 +17,8 @@ import (
 const (
 	// ZenScoreColumn is the sort column of the Zen Score.
 	ZenScoreColumn = "zen_score"
+	// ZenScoreCoefColumn is the sort column of the Zen Score times the Zen coefficient.
+	ZenScoreCoefColumn = "zen_score_coef"
 	// zenScoreCategoriesKeyPrefix is the client setting that holds the category
 	// values of one instance as a JSON object, category name to value. The
 	// frontend owns the key; see useZenScoreCategoryValues.
@@ -214,13 +216,33 @@ func (sm *SyncManager) addZenScoreStats(ctx context.Context, instanceID int, sta
 	}
 }
 
-// zenScoreOrder sorts by Zen Score. Torrents without a score come last in each
-// direction.
-func zenScoreOrder(rows []*qbt.Torrent, categoryValues func(i int) map[string]float64, desc bool, tie func(a, b int) int) func(a, b int) int {
+// IsZenSortColumn reports whether column sorts by a Zen value that needs the
+// category values of the instance.
+func IsZenSortColumn(column string) bool {
+	return column == ZenScoreColumn || column == ZenScoreCoefColumn
+}
+
+// ZenScoreCoef returns the Zen Score of a torrent times its own Zen
+// coefficient. ok is false for a torrent that has no score yet.
+func ZenScoreCoef(t *qbt.Torrent, categoryValues map[string]float64) (value float64, ok bool) {
+	score, ok := ZenScore(t, categoryValues)
+	if !ok {
+		return 0, false
+	}
+	return score * ZenCoef(t.Size), true
+}
+
+// zenScoreOrder sorts by the Zen value of column. Torrents without a score come
+// last in each direction.
+func zenScoreOrder(column string, rows []*qbt.Torrent, categoryValues func(i int) map[string]float64, desc bool, tie func(a, b int) int) func(a, b int) int {
+	value := ZenScore
+	if column == ZenScoreCoefColumn {
+		value = ZenScoreCoef
+	}
 	scores := make([]float64, len(rows))
 	scored := make([]bool, len(rows))
 	for i, t := range rows {
-		scores[i], scored[i] = ZenScore(t, categoryValues(i))
+		scores[i], scored[i] = value(t, categoryValues(i))
 	}
 	return func(a, b int) int {
 		switch {
@@ -238,19 +260,19 @@ func zenScoreOrder(rows []*qbt.Torrent, categoryValues func(i int) map[string]fl
 	}
 }
 
-// sortTorrentsByZenScore sorts the rows of one instance in place.
-func (sm *SyncManager) sortTorrentsByZenScore(ctx context.Context, instanceID int, torrents []qbt.Torrent, desc bool) {
+// sortTorrentsByZenScore sorts the rows of one instance in place by a Zen sort column.
+func (sm *SyncManager) sortTorrentsByZenScore(ctx context.Context, column string, instanceID int, torrents []qbt.Torrent, desc bool) {
 	rows := make([]*qbt.Torrent, len(torrents))
 	for i := range torrents {
 		rows[i] = &torrents[i]
 	}
 	values := sm.zenCategoryValues(ctx, instanceID)
-	sortByIndex(torrents, zenScoreOrder(rows, func(int) map[string]float64 { return values }, desc, func(a, b int) int { return a - b }))
+	sortByIndex(torrents, zenScoreOrder(column, rows, func(int) map[string]float64 { return values }, desc, func(a, b int) int { return a - b }))
 }
 
 // sortCrossInstanceByZenScore sorts Unified rows in place, each with the
 // category values of its own instance. Equal rows sort by instance.
-func (sm *SyncManager) sortCrossInstanceByZenScore(ctx context.Context, torrents []CrossInstanceTorrentView, desc bool) {
+func (sm *SyncManager) sortCrossInstanceByZenScore(ctx context.Context, column string, torrents []CrossInstanceTorrentView, desc bool) {
 	rows := make([]*qbt.Torrent, len(torrents))
 	for i := range torrents {
 		rows[i] = torrents[i].Torrent
@@ -266,5 +288,5 @@ func (sm *SyncManager) sortCrossInstanceByZenScore(ctx context.Context, torrents
 		return v
 	}
 	tie := func(a, b int) int { return cmp.Or(cmp.Compare(torrents[a].InstanceID, torrents[b].InstanceID), a-b) }
-	sortByIndex(torrents, zenScoreOrder(rows, values, desc, tie))
+	sortByIndex(torrents, zenScoreOrder(column, rows, values, desc, tie))
 }

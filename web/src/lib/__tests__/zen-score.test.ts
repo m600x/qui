@@ -4,7 +4,7 @@
  */
 
 import { describe, expect, it } from "vitest"
-import { computeZenCoef, computeZenScore, parseZenCategoryValues } from "@/lib/zen-score"
+import { computeZenCoef, computeZenScore, computeZenScoreCoef, parseZenCategoryValues } from "@/lib/zen-score"
 
 const GB = 1024 ** 3
 const DAY = 24 * 60 * 60
@@ -87,6 +87,19 @@ describe("computeZenCoef", () => {
     const coefs = sizes.map(computeZenCoef)
     expect(coefs).toEqual([...coefs].sort((a, b) => a - b))
     expect(computeZenCoef(4.01 * DECIMAL_GB) - computeZenCoef(3.99 * DECIMAL_GB)).toBeLessThan(0.01)
+  })
+})
+
+describe("computeZenScoreCoef", () => {
+  it("multiplies the score by the torrent's own coefficient", () => {
+    // 4 GB: coefficient 1; 1 + 0.1 for 10 days.
+    expect(computeZenScoreCoef(torrent({ size: 4e9, seeding_time: 10 * DAY }), values)).toBeCloseTo(1.1, 10)
+    // 0.5 GB: coefficient 0.75 / 4.25.
+    expect(computeZenScoreCoef(torrent({ size: 0.5e9 }), values)).toBeCloseTo(1 * (0.75 / 4.25), 10)
+  })
+
+  it("has no value before the torrent has seeded", () => {
+    expect(computeZenScoreCoef(torrent({ seeding_time: 0 }), values)).toBeNull()
   })
 })
 

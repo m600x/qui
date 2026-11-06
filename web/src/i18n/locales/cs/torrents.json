@@ -1640,6 +1640,7 @@
     "seedingTime": "Čas seedování",
     "zenScore": "Zen Score",
     "zenCoef": "Zen coef",
+    "zenScoreCoef": "Zen Score × coef",
     "savePath": "Složka pro uložení",
     "completed": "Dokončeno",
     "ratioLimit": "Limit poměru",

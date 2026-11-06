@@ -211,10 +211,39 @@ func TestSortTorrentsByZenScore(t *testing.T) {
 	sm := &SyncManager{}
 
 	asc := build()
-	sm.sortTorrentsByZenScore(context.Background(), 1, asc, false)
+	sm.sortTorrentsByZenScore(context.Background(), ZenScoreColumn, 1, asc, false)
 	require.Equal(t, []string{"c", "d", "a", "b", "e"}, hashes(asc))
 
 	desc := build()
-	sm.sortTorrentsByZenScore(context.Background(), 1, desc, true)
+	sm.sortTorrentsByZenScore(context.Background(), ZenScoreColumn, 1, desc, true)
 	require.Equal(t, []string{"a", "d", "c", "b", "e"}, hashes(desc))
+}
+
+func TestZenScoreCoefAndSort(t *testing.T) {
+	t.Parallel()
+
+	const day = int64(secondsPerDay)
+	const gb = int64(1_000_000_000)
+	// Unseeded: no value.
+	_, ok := ZenScoreCoef(&qbt.Torrent{Size: 10 * gb}, nil)
+	assert.False(t, ok)
+	// 4 GB at 1.0 coefficient: 1 + 0.1 = 1.1.
+	value, ok := ZenScoreCoef(&qbt.Torrent{Size: 4 * gb, SeedingTime: 10 * day}, nil)
+	assert.True(t, ok)
+	assert.InDelta(t, 1.1, value, 1e-9)
+
+	// The highest Zen Score is the small old item, but the big item has the highest product.
+	torrents := []qbt.Torrent{
+		{Hash: "small", Size: gb / 2, SeedingTime: 200 * day},
+		{Hash: "big", Size: 20 * gb, SeedingTime: 10 * day},
+		{Hash: "unseeded", Size: 20 * gb},
+	}
+	byScore := append([]qbt.Torrent(nil), torrents...)
+	byProduct := append([]qbt.Torrent(nil), torrents...)
+	sm := &SyncManager{}
+	sm.sortTorrentsByZenScore(context.Background(), ZenScoreColumn, 1, byScore, true)
+	sm.sortTorrentsByZenScore(context.Background(), ZenScoreCoefColumn, 1, byProduct, true)
+	assert.Equal(t, "small", byScore[0].Hash)
+	assert.Equal(t, "big", byProduct[0].Hash)
+	assert.Equal(t, "unseeded", byProduct[2].Hash)
 }

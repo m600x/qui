@@ -1716,6 +1716,7 @@
     "seedingTime": "Час роздавання",
     "zenScore": "Zen Score",
     "zenCoef": "Zen coef",
+    "zenScoreCoef": "Zen Score × coef",
     "savePath": "Зберегти шлях",
     "completed": "Виконано",
     "ratioLimit": "Ліміт співвідношення",

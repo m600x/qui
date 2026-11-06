@@ -1496,6 +1496,7 @@
     "seedingTime": "시딩 시간",
     "zenScore": "Zen Score",
     "zenCoef": "Zen coef",
+    "zenScoreCoef": "Zen Score × coef",
     "savePath": "저장 경로",
     "completed": "완료됨",
     "ratioLimit": "비율 제한",

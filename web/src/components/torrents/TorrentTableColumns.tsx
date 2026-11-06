@@ -22,7 +22,7 @@ import {
 } from "@/lib/incognito"
 import { formatTimestamp as formatStoredTimestamp, isNeverCompletedTimestamp } from "@/lib/dateTimeUtils"
 import { formatSpeedWithUnit, type SpeedUnit } from "@/lib/speedUnits"
-import { computeZenCoef, computeZenScore, type ZenCategoryValues } from "@/lib/zen-score"
+import { computeZenCoef, computeZenScore, computeZenScoreCoef, type ZenCategoryValues } from "@/lib/zen-score"
 import { formatReannounceIn, getStateLabel } from "@/lib/torrent-state-utils"
 import {
   extractTrackerHost,
@@ -897,6 +897,16 @@ export const createColumns = ({
         <span className="text-sm overflow-hidden whitespace-nowrap">{computeZenCoef(row.original.size).toFixed(2)}</span>
       ),
       size: 100,
+    },
+    {
+      id: "zen_score_coef",
+      accessorFn: (torrent) => computeZenScoreCoef(torrent, getZenCategoryValues(torrent)),
+      header: t("tableColumns.zenScoreCoef"),
+      cell: ({ row }) => {
+        const value = computeZenScoreCoef(row.original, getZenCategoryValues(row.original))
+        return <span className="text-sm overflow-hidden whitespace-nowrap">{value === null ? "-" : value.toFixed(2)}</span>
+      },
+      size: 130,
     },
     {
       accessorKey: "save_path",

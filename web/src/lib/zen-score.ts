@@ -100,6 +100,15 @@ export function computeZenCoef(sizeBytes: number): number {
   return (gb / COEF_REFERENCE_GB) ** COEF_LARGE_EXPONENT
 }
 
+/** A torrent's Zen Score times its own Zen coefficient, or null while it has no score. */
+export function computeZenScoreCoef(
+  torrent: Pick<Torrent, "category" | "seeding_time" | "num_complete" | "size">,
+  categoryValues: ZenCategoryValues
+): number | null {
+  const score = computeZenScore(torrent, categoryValues)
+  return score === null ? null : score * computeZenCoef(torrent.size)
+}
+
 /** Category values of one instance, as a synced client setting. */
 export function useZenCategoryValues(instanceId: number) {
   return useClientSetting<ZenCategoryValues>(zenScoreSettingKey(instanceId), {
