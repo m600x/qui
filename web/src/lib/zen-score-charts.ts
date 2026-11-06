@@ -46,7 +46,7 @@ function sumArrays(lists: Array<number[] | undefined>, length: number): number[]
 }
 
 /** Adds the Zen statistics of every instance. */
-export function aggregateZenDistribution(statsList: Array<TorrentStats | undefined>): ZenDistribution {
+export function aggregateZenDistribution(statsList: Array<TorrentStats | null | undefined>): ZenDistribution {
   const stats = statsList.filter((s): s is TorrentStats => Boolean(s))
   const sum = (pick: (s: TorrentStats) => number | undefined) => stats.reduce((total, s) => total + (pick(s) ?? 0), 0)
   const lists = (pick: (s: TorrentStats) => number[] | undefined, edges: number[]) =>

@@ -295,7 +295,7 @@ function PartsBar({ parts, total }: { parts: Array<{ label: string; value: numbe
 }
 
 /** Charts of how the Zen Score, the Zen coefficient and their product are spread over the c411 torrents. */
-export function ZenCharts({ stats }: { stats: Array<TorrentStats | undefined> }) {
+export function ZenCharts({ stats }: { stats: Array<TorrentStats | null | undefined> }) {
   const { t } = useTranslation("dashboard")
   const data = useMemo(() => aggregateZenDistribution(stats), [stats])
 
