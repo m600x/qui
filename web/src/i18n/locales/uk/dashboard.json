@@ -266,5 +266,14 @@
     "ageDescription": "Torrents by how long they have seeded. The tiers of the duration bonus are 7, 30, 90 and 180 days.",
     "swarmTitle": "Seeders in the swarm",
     "swarmDescription": "Torrents by seeders. Only 41 to 250 seeders earn a bonus."
+  },
+  "zenPayout": {
+    "title": "Estimated payout (c411)",
+    "formula": "{{counted}} torrents × {{share}}% of the day × coef {{coef}} × score {{score}} ÷ 7 × (1 + {{bonus}}%)",
+    "soFar": "So far today, as if every counted torrent was shared since midnight",
+    "projected": "End of day, if nothing changes until midnight",
+    "bonus": "Bonus (%)",
+    "counted": "Counted torrents",
+    "countedHint": "Empty uses the {{count}} found here"
   }
 }

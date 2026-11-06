@@ -59,6 +59,7 @@ const SYNCED_KEYS = new Set<string>([
   "torrent-details-last-tab",
   "qui-log-levels",
   "qui-theme-visibility",
+  "qui-zen-payout-settings",
 ])
 const SYNCED_PREFIXES = [
   "qui-cross-seed-blocklist-",
