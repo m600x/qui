@@ -390,12 +390,11 @@ func (s *Service) computeNextRunDelay(ctx context.Context, settings *models.Cros
 		return time.Hour, false
 	}
 
-	// RSS Automation: enforce minimum 30 minutes between runs
 	intervalMinutes := settings.RunIntervalMinutes
 	if intervalMinutes <= 0 {
 		intervalMinutes = 120
 	}
-	interval := max(time.Duration(intervalMinutes)*time.Minute, 30*time.Minute)
+	interval := time.Duration(intervalMinutes) * time.Minute
 
 	lastRun, err := s.automationStore.GetLatestRun(ctx)
 	if err != nil {

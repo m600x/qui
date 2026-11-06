@@ -108,11 +108,9 @@ func (s *Service) UpdateAutomationSettings(ctx context.Context, settings *models
 // validateAndNormalizeSettings validates and normalizes automation settings.
 // These settings apply to RSS Automation only, not Seeded Torrent Search.
 func (s *Service) validateAndNormalizeSettings(settings *models.CrossSeedAutomationSettings) {
-	// RSS Automation: minimum 30 minutes between RSS feed polls, default 120 minutes
+	// RSS Automation: default 120 minutes between RSS feed polls, no minimum
 	if settings.RunIntervalMinutes <= 0 {
 		settings.RunIntervalMinutes = 120
-	} else if settings.RunIntervalMinutes < 30 {
-		settings.RunIntervalMinutes = 30
 	}
 	// RSS Automation: maximum number of RSS results to process per run
 	if settings.MaxResultsPerRun <= 0 {

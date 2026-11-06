@@ -5,7 +5,7 @@
 
 import { useEffect, useMemo, useState } from "react"
 
-export const MIN_RSS_INTERVAL_MINUTES = 30
+export const MIN_RSS_INTERVAL_MINUTES = 1
 export const DEFAULT_RSS_INTERVAL_MINUTES = 120
 
 function formatDurationShort(ms: number): string {
