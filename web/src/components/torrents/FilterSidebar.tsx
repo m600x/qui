@@ -75,6 +75,7 @@ import { useTranslation } from "react-i18next"
 import { CategoryTree } from "./CategoryTree"
 import { FilterClearButton } from "./FilterClearButton"
 import { FilterViewsSection } from "./FilterViewsSection"
+import { ZenRangeFilter } from "./ZenRangeFilter"
 import {
   CreateCategoryDialog,
   CreateTagDialog,
@@ -3056,6 +3057,28 @@ const FilterSidebarComponent = ({
                 </div>
               </AccordionContent>
             </AccordionItem>
+
+            {/* Zen Score and Zen coef ranges */}
+            <ZenRangeFilter
+              value="zen-score"
+              title={t("filterSidebar.zenScore")}
+              min={selectedFilters.zenScoreMin}
+              max={selectedFilters.zenScoreMax}
+              maxPlaceholder="2"
+              onChange={(zenScoreMin, zenScoreMax) => applyFilterChange({ ...selectedFilters, zenScoreMin, zenScoreMax })}
+              triggerClassName={accordionTriggerClass}
+              contentClassName={accordionContentClass}
+            />
+            <ZenRangeFilter
+              value="zen-coef"
+              title={t("filterSidebar.zenCoef")}
+              min={selectedFilters.zenCoefMin}
+              max={selectedFilters.zenCoefMax}
+              maxPlaceholder="2+"
+              onChange={(zenCoefMin, zenCoefMax) => applyFilterChange({ ...selectedFilters, zenCoefMin, zenCoefMax })}
+              triggerClassName={accordionTriggerClass}
+              contentClassName={accordionContentClass}
+            />
           </Accordion>
         </div>
       </ScrollArea>

@@ -1003,7 +1003,11 @@
       "trackerDown": "Tracker injoignable",
       "crossSeeds": "Cross Seeds",
       "trackerError": "Erreur Tracker"
-    }
+    },
+    "zenScore": "Zen Score",
+    "zenCoef": "Zen coef",
+    "rangeMin": "minimum",
+    "rangeMax": "maximum"
   },
   "statusBar": {
     "selected": "{{count}} sélectionné(s)",
@@ -1567,6 +1571,7 @@
     "timeActive": "Temps Actif",
     "seedingTime": "Temps de Seed",
     "zenScore": "Zen Score",
+    "zenCoef": "Zen coef",
     "savePath": "Chemin de Sauvegarde",
     "completed": "Terminé",
     "ratioLimit": "Limite Ratio",

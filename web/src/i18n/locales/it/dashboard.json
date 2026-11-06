@@ -83,7 +83,9 @@
     "torrents": "Torrent",
     "activeCount": "{{count}} attivi",
     "download": "Download",
-    "upload": "Upload"
+    "upload": "Upload",
+    "zenScore": "Zen Score",
+    "zenScoreCaption": "{{count}} torrents"
   },
   "globalStats": {
     "instances": "Istanze",
@@ -93,7 +95,9 @@
     "totalDownload": "Download totale",
     "downloadingActive": "{{count}} attivi - {{size}} rimanenti",
     "totalUpload": "Upload totale",
-    "seedingActive": "{{count}} attivi - {{size}} in distribuzione"
+    "seedingActive": "{{count}} attivi - {{size}} in distribuzione",
+    "zenScore": "Zen Score (c411)",
+    "zenScoreCaption": "Average of {{count}} torrents"
   },
   "serverStats": {
     "title": "Statistiche del server",

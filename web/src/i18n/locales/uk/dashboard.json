@@ -83,7 +83,9 @@
     "torrents": "Торенти",
     "activeCount": "{{count}} активних",
     "download": "Завантаження",
-    "upload": "Вивантаження"
+    "upload": "Вивантаження",
+    "zenScore": "Zen Score",
+    "zenScoreCaption": "{{count}} torrents"
   },
   "globalStats": {
     "instances": "Екземпляри",
@@ -93,7 +95,9 @@
     "totalDownload": "Всього завантажено",
     "downloadingActive": "{{count}} активних — залишилось {{size}}",
     "totalUpload": "Всього вивантажено",
-    "seedingActive": "{{count}} активних — роздається {{size}}"
+    "seedingActive": "{{count}} активних — роздається {{size}}",
+    "zenScore": "Zen Score (c411)",
+    "zenScoreCaption": "Average of {{count}} torrents"
   },
   "serverStats": {
     "title": "Статистика сервера",

@@ -1064,7 +1064,11 @@
       "trackerDown": "Tracker je nedostupný",
       "crossSeeds": "Křížové sdílení",
       "trackerError": "Chyba trackeru"
-    }
+    },
+    "zenScore": "Zen Score",
+    "zenCoef": "Zen coef",
+    "rangeMin": "minimum",
+    "rangeMax": "maximum"
   },
   "statusBar": {
     "selected": "{{count}} vybraných",
@@ -1635,6 +1639,7 @@
     "timeActive": "Aktivní čas",
     "seedingTime": "Čas seedování",
     "zenScore": "Zen Score",
+    "zenCoef": "Zen coef",
     "savePath": "Složka pro uložení",
     "completed": "Dokončeno",
     "ratioLimit": "Limit poměru",

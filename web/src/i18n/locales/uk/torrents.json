@@ -1125,7 +1125,11 @@
       "trackerDown": "Трекер вимкнено",
       "crossSeeds": "Крос-сіди",
       "trackerError": "Помилка трекера"
-    }
+    },
+    "zenScore": "Zen Score",
+    "zenCoef": "Zen coef",
+    "rangeMin": "minimum",
+    "rangeMax": "maximum"
   },
   "statusBar": {
     "selected": "Вибрано {{count}}",
@@ -1711,6 +1715,7 @@
     "timeActive": "Час активний",
     "seedingTime": "Час роздавання",
     "zenScore": "Zen Score",
+    "zenCoef": "Zen coef",
     "savePath": "Зберегти шлях",
     "completed": "Виконано",
     "ratioLimit": "Ліміт співвідношення",

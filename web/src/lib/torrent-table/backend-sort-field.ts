@@ -16,6 +16,8 @@ export function getBackendSortField(columnId: string): string {
       return "num_complete" // Sort by total seeds, not connected
     case "num_leechs":
       return "num_incomplete" // Sort by total peers, not connected
+    case "zen_coef":
+      return "size" // The coefficient grows with the size, so the sizes sort the same way
     default:
       return columnId
   }

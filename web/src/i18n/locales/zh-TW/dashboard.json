@@ -83,7 +83,9 @@
     "torrents": "種子",
     "activeCount": "{{count}} 個活躍",
     "download": "下載",
-    "upload": "上傳"
+    "upload": "上傳",
+    "zenScore": "Zen Score",
+    "zenScoreCaption": "{{count}} torrents"
   },
   "globalStats": {
     "instances": "實例",
@@ -93,7 +95,9 @@
     "totalDownload": "總下載",
     "downloadingActive": "{{count}} 個活躍 - 剩餘 {{size}}",
     "totalUpload": "總上傳",
-    "seedingActive": "{{count}} 個活躍 - {{size}} 做種中"
+    "seedingActive": "{{count}} 個活躍 - {{size}} 做種中",
+    "zenScore": "Zen Score (c411)",
+    "zenScoreCaption": "Average of {{count}} torrents"
   },
   "serverStats": {
     "title": "伺服器統計",

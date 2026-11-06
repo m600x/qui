@@ -173,6 +173,9 @@ export interface TorrentStats {
   totalSize?: number
   totalRemainingSize?: number
   totalSeedingSize?: number
+  // Zen Scores of the torrents on the c411 tracker; the average is the sum over the count.
+  zenScoreSum?: number
+  zenScoreCount?: number
 }
 
 export interface CacheMetadata {
@@ -225,6 +228,11 @@ export interface TorrentFilters {
   trackers: string[]
   excludeTrackers: string[]
   expr?: string
+  // Inclusive ranges; a missing bound is open. A Zen Score range hides torrents with no score yet.
+  zenScoreMin?: number
+  zenScoreMax?: number
+  zenCoefMin?: number
+  zenCoefMax?: number
 }
 
 /**

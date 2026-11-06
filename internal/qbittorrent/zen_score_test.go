@@ -84,6 +84,104 @@ func TestZenCategoryValues(t *testing.T) {
 	assert.Equal(t, defaultZenCategoryValues(), sm.zenCategoryValues(context.Background(), 5))
 }
 
+func TestMatchesZenStatsTracker(t *testing.T) {
+	t.Parallel()
+
+	sm := &SyncManager{}
+	names := map[string]string{"tracker.example.org": "My C411"}
+	tests := []struct {
+		name    string
+		torrent qbt.Torrent
+		want    bool
+	}{
+		{"url contains it", qbt.Torrent{Tracker: "https://tracker.c411.org/announce"}, true},
+		{"url in any letter case", qbt.Torrent{Tracker: "https://TRACKER.C411.ORG/announce"}, true},
+		{"display name contains it", qbt.Torrent{Tracker: "https://tracker.example.org/announce"}, true},
+		{"later tracker of the torrent", qbt.Torrent{Trackers: []qbt.TorrentTracker{{Url: "https://a.example.net/announce"}, {Url: "https://x.c411.org/announce"}}}, true},
+		{"other tracker", qbt.Torrent{Tracker: "https://tracker.other.org/announce"}, false},
+		{"no tracker", qbt.Torrent{}, false},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+			assert.Equal(t, tc.want, sm.matchesZenStatsTracker(&tc.torrent, names))
+		})
+	}
+}
+
+func TestAddZenScoreStats(t *testing.T) {
+	t.Parallel()
+
+	const day = int64(secondsPerDay)
+	sm := &SyncManager{}
+	stats := &TorrentStats{}
+	sm.addZenScoreStats(context.Background(), 1, stats, []qbt.Torrent{
+		{Tracker: "https://t.c411.org/announce", Category: "apps", SeedingTime: 10 * day},
+		{Tracker: "https://t.c411.org/announce", Category: "xxx", SeedingTime: 100 * day},
+		{Tracker: "https://t.c411.org/announce", Category: "apps"},
+		{Tracker: "https://t.other.org/announce", Category: "apps", SeedingTime: 200 * day},
+	})
+	// 1 + 0.1 and 0.5 + 0.35; the unseeded and the other tracker's torrent do not count.
+	assert.Equal(t, 2, stats.ZenScoreCount)
+	assert.InDelta(t, 1.95, stats.ZenScoreSum, 1e-9)
+
+	merged := mergeTorrentStats(&TorrentStats{ZenScoreSum: 1, ZenScoreCount: 1}, stats)
+	assert.Equal(t, 3, merged.ZenScoreCount)
+	assert.InDelta(t, 2.95, merged.ZenScoreSum, 1e-9)
+}
+
+func TestZenCoef(t *testing.T) {
+	t.Parallel()
+
+	assert.InDelta(t, 0.25/4.25, ZenCoef(0), 1e-9)
+	assert.InDelta(t, 0.0591, ZenCoef(1_000_000), 1e-3)
+	assert.InDelta(t, 0.2941, ZenCoef(1_000_000_000), 1e-3)
+	assert.InDelta(t, 1.0, ZenCoef(4_000_000_000), 1e-9)
+	assert.InDelta(t, 1.241, ZenCoef(25_000_000_000), 1e-3)
+	assert.InDelta(t, 1.377, ZenCoef(60_000_000_000), 1e-3)
+	assert.InDelta(t, 0.25/4.25, ZenCoef(-5), 1e-9)
+}
+
+func TestApplyZenFilters(t *testing.T) {
+	t.Parallel()
+
+	const day = int64(secondsPerDay)
+	const gb = int64(1_000_000_000)
+	// a: score 1.35, coef 0.29. b: score 1.5, coef 1.11. c: no score, coef 1.11. d: score 1.0, coef 0.08.
+	build := func() []qbt.Torrent {
+		return []qbt.Torrent{
+			{Hash: "a", Size: gb, SeedingTime: 100 * day},
+			{Hash: "b", Size: 10 * gb, SeedingTime: 200 * day},
+			{Hash: "c", Size: 10 * gb},
+			{Hash: "d", Size: gb / 10, SeedingTime: day},
+		}
+	}
+	hashes := func(ts []qbt.Torrent) string {
+		var out string
+		for _, tr := range ts {
+			out += tr.Hash
+		}
+		return out
+	}
+	f := func(v float64) *float64 { return &v }
+	sm := &SyncManager{}
+	ctx := context.Background()
+
+	torrents := build()
+	assert.Equal(t, "abcd", hashes(sm.applyZenFilters(ctx, 1, torrents, FilterOptions{})))
+	assert.Equal(t, "bc", hashes(sm.applyZenFilters(ctx, 1, torrents, FilterOptions{ZenCoefMin: f(1)})))
+	assert.Equal(t, "ad", hashes(sm.applyZenFilters(ctx, 1, torrents, FilterOptions{ZenCoefMax: f(0.5)})))
+	// A Zen Score range leaves out the torrent that has not seeded.
+	assert.Equal(t, "abd", hashes(sm.applyZenFilters(ctx, 1, torrents, FilterOptions{ZenScoreMin: f(0)})))
+	assert.Equal(t, "ab", hashes(sm.applyZenFilters(ctx, 1, torrents, FilterOptions{ZenScoreMin: f(1.35), ZenScoreMax: f(2)})))
+	assert.Equal(t, "b", hashes(sm.applyZenFilters(ctx, 1, torrents, FilterOptions{ZenScoreMin: f(1.35), ZenCoefMin: f(1)})))
+	// The input is left as it was.
+	assert.Equal(t, "abcd", hashes(torrents))
+
+	assert.False(t, FilterOptions{ZenCoefMax: f(1)}.IsEmpty())
+	assert.True(t, FilterOptions{}.IsEmpty())
+}
+
 func TestSortTorrentsByZenScore(t *testing.T) {
 	t.Parallel()
 

@@ -4,7 +4,7 @@
  */
 
 import { describe, expect, it } from "vitest"
-import { computeZenScore, parseZenCategoryValues } from "@/lib/zen-score"
+import { computeZenCoef, computeZenScore, parseZenCategoryValues } from "@/lib/zen-score"
 
 const GB = 1024 ** 3
 const DAY = 24 * 60 * 60
@@ -57,6 +57,36 @@ describe("computeZenScore", () => {
     [-1, GB, 1],
   ])("%i seeders at %i bytes scores %f", (seeders, size, expected) => {
     expect(computeZenScore(torrent({ num_complete: seeders, size }), values)).toBe(expected)
+  })
+})
+
+describe("computeZenCoef", () => {
+  const MB = 1e6
+  const DECIMAL_GB = 1e9
+
+  it.each([
+    [1 * MB, 0.06],
+    [100 * MB, 0.08],
+    [500 * MB, 0.18],
+    [1 * DECIMAL_GB, 0.29],
+    [4 * DECIMAL_GB, 1],
+    [25 * DECIMAL_GB, 1.24],
+    [60 * DECIMAL_GB, 1.38],
+  ])("matches the listed value at %i bytes", (size, expected) => {
+    expect(computeZenCoef(size)).toBeCloseTo(expected, 1)
+  })
+
+  it("is (size + 0.25 GB) / 4.25 GB up to 4 GB", () => {
+    expect(computeZenCoef(0)).toBeCloseTo(0.25 / 4.25, 10)
+    expect(computeZenCoef(2 * DECIMAL_GB)).toBeCloseTo(2.25 / 4.25, 10)
+    expect(computeZenCoef(4 * DECIMAL_GB)).toBe(1)
+  })
+
+  it("grows with the size and has no jump at 4 GB", () => {
+    const sizes = [0, 2 * MB, 50 * MB, 300 * MB, 2 * DECIMAL_GB, 3.99 * DECIMAL_GB, 4.01 * DECIMAL_GB, 10 * DECIMAL_GB, 500 * DECIMAL_GB]
+    const coefs = sizes.map(computeZenCoef)
+    expect(coefs).toEqual([...coefs].sort((a, b) => a - b))
+    expect(computeZenCoef(4.01 * DECIMAL_GB) - computeZenCoef(3.99 * DECIMAL_GB)).toBeLessThan(0.01)
   })
 })
 

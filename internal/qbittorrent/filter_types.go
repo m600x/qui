@@ -16,6 +16,13 @@ type FilterOptions struct {
 	ExcludeTrackers   []string `json:"excludeTrackers"`
 	Expr              string   `json:"expr"`
 
+	// Inclusive ranges of the Zen Score and the Zen coefficient. A nil bound is
+	// open. A Zen Score range leaves out the torrents that have no score yet.
+	ZenScoreMin *float64 `json:"zenScoreMin,omitempty"`
+	ZenScoreMax *float64 `json:"zenScoreMax,omitempty"`
+	ZenCoefMin  *float64 `json:"zenCoefMin,omitempty"`
+	ZenCoefMax  *float64 `json:"zenCoefMax,omitempty"`
+
 	HideTrackerPasskeys bool `json:"-"`
 }
 
@@ -30,5 +37,11 @@ func (f FilterOptions) IsEmpty() bool {
 		len(f.ExcludeTags) == 0 &&
 		len(f.Trackers) == 0 &&
 		len(f.ExcludeTrackers) == 0 &&
-		f.Expr == ""
+		f.Expr == "" &&
+		!f.hasZenRange()
+}
+
+// hasZenRange reports whether a Zen Score or Zen coefficient bound is set.
+func (f FilterOptions) hasZenRange() bool {
+	return f.ZenScoreMin != nil || f.ZenScoreMax != nil || f.ZenCoefMin != nil || f.ZenCoefMax != nil
 }

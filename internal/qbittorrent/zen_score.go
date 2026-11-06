@@ -102,6 +102,114 @@ func ZenScore(t *qbt.Torrent, categoryValues map[string]float64) (score float64,
 	return math.Round(score*100) / 100, true
 }
 
+const (
+	zenCoefGB            = 1e9
+	zenCoefReferenceGB   = 4.0
+	zenCoefSmallBonusGB  = 0.25
+	zenCoefLargeExponent = 0.118
+)
+
+// ZenCoef returns the Zen coefficient of a size in bytes. Up to 4 GB it is
+// (size + 0.25 GB) / 4.25 GB, and above that (size / 4 GB) ^ 0.118. Sizes are
+// decimal. Keep it in step with computeZenCoef in web/src/lib/zen-score.ts.
+func ZenCoef(sizeBytes int64) float64 {
+	gb := float64(max(sizeBytes, 0)) / zenCoefGB
+	if gb <= zenCoefReferenceGB {
+		return (gb + zenCoefSmallBonusGB) / (zenCoefReferenceGB + zenCoefSmallBonusGB)
+	}
+	return math.Pow(gb/zenCoefReferenceGB, zenCoefLargeExponent)
+}
+
+func inZenRange(value float64, lower, upper *float64) bool {
+	return (lower == nil || value >= *lower) && (upper == nil || value <= *upper)
+}
+
+// applyZenFilters keeps the torrents inside the Zen Score and Zen coefficient
+// ranges of filters. It returns torrents itself when no range is set, and a new
+// slice otherwise.
+func (sm *SyncManager) applyZenFilters(ctx context.Context, instanceID int, torrents []qbt.Torrent, filters FilterOptions) []qbt.Torrent {
+	if !filters.hasZenRange() {
+		return torrents
+	}
+	hasScoreRange := filters.ZenScoreMin != nil || filters.ZenScoreMax != nil
+	var categoryValues map[string]float64
+	if hasScoreRange {
+		categoryValues = sm.zenCategoryValues(ctx, instanceID)
+	}
+
+	kept := make([]qbt.Torrent, 0, len(torrents))
+	for i := range torrents {
+		t := &torrents[i]
+		if hasScoreRange {
+			score, ok := ZenScore(t, categoryValues)
+			if !ok || !inZenRange(score, filters.ZenScoreMin, filters.ZenScoreMax) {
+				continue
+			}
+		}
+		if !inZenRange(ZenCoef(t.Size), filters.ZenCoefMin, filters.ZenCoefMax) {
+			continue
+		}
+		kept = append(kept, *t)
+	}
+	return kept
+}
+
+// zenStatsTracker selects the torrents that count in the dashboard average: the
+// ones whose tracker URL or tracker display name contains it, in any letter case.
+const zenStatsTracker = "c411"
+
+// matchesZenStatsTracker reports whether a torrent's tracker URL or tracker
+// display name contains zenStatsTracker. displayNames maps a domain to its
+// custom display name.
+func (sm *SyncManager) matchesZenStatsTracker(t *qbt.Torrent, displayNames map[string]string) bool {
+	check := func(trackerURL string) bool {
+		if trackerURL == "" {
+			return false
+		}
+		if strings.Contains(strings.ToLower(trackerURL), zenStatsTracker) {
+			return true
+		}
+		name := displayNames[strings.ToLower(sm.ExtractDomainFromURL(trackerURL))]
+		return strings.Contains(strings.ToLower(name), zenStatsTracker)
+	}
+	if check(t.Tracker) {
+		return true
+	}
+	for _, tracker := range t.Trackers {
+		if check(tracker.Url) {
+			return true
+		}
+	}
+	return false
+}
+
+// addZenScoreStats adds the sum and count of the Zen Scores of the torrents of
+// one instance that match zenStatsTracker. The dashboard divides the totals of
+// all instances.
+func (sm *SyncManager) addZenScoreStats(ctx context.Context, instanceID int, stats *TorrentStats, torrents []qbt.Torrent) {
+	var displayNames map[string]string
+	var categoryValues map[string]float64
+	for i := range torrents {
+		t := &torrents[i]
+		if t.SeedingTime <= 0 {
+			continue
+		}
+		if displayNames == nil {
+			displayNames = sm.getTrackerDisplayNameMap()
+		}
+		if !sm.matchesZenStatsTracker(t, displayNames) {
+			continue
+		}
+		if categoryValues == nil {
+			categoryValues = sm.zenCategoryValues(ctx, instanceID)
+		}
+		if score, ok := ZenScore(t, categoryValues); ok {
+			stats.ZenScoreSum += score
+			stats.ZenScoreCount++
+		}
+	}
+}
+
 // zenScoreOrder sorts by Zen Score. Torrents without a score come last in each
 // direction.
 func zenScoreOrder(rows []*qbt.Torrent, categoryValues func(i int) map[string]float64, desc bool, tie func(a, b int) int) func(a, b int) int {

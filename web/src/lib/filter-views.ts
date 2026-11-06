@@ -16,6 +16,8 @@ const FILTER_ARRAY_KEYS = [
   "excludeTrackers",
 ] as const
 
+const FILTER_RANGE_KEYS = ["zenScoreMin", "zenScoreMax", "zenCoefMin", "zenCoefMax"] as const
+
 /**
  * Normalizes a filter object into the snapshot a saved view stores: every array
  * key present and sorted, `expr` normalized, and the derived `expandedCategories`
@@ -28,6 +30,11 @@ export function toViewFilters(filters: Partial<TorrentFilters> | undefined): Tor
   const normalized = { expr: filters?.expr || "" } as TorrentFilters
   for (const key of FILTER_ARRAY_KEYS) {
     normalized[key] = [...(filters?.[key] ?? [])].sort()
+  }
+  // A range bound is set only when it has a value, so a view without one stays equal to a view with none.
+  for (const key of FILTER_RANGE_KEYS) {
+    const value = filters?.[key]
+    if (typeof value === "number" && Number.isFinite(value)) normalized[key] = value
   }
   return normalized
 }
@@ -43,5 +50,7 @@ export const EMPTY_SIDEBAR_FILTERS: TorrentFilters = toViewFilters(undefined)
 
 /** Reports whether any sidebar filter is set. A blank expression filters nothing. */
 export function hasSidebarFilters(filters: Partial<TorrentFilters>): boolean {
-  return FILTER_ARRAY_KEYS.some(key => (filters[key]?.length ?? 0) > 0) || Boolean(filters.expr?.trim())
+  return FILTER_ARRAY_KEYS.some(key => (filters[key]?.length ?? 0) > 0) ||
+    FILTER_RANGE_KEYS.some(key => typeof filters[key] === "number") ||
+    Boolean(filters.expr?.trim())
 }

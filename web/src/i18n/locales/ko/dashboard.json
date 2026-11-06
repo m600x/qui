@@ -83,7 +83,9 @@
     "torrents": "토렌트",
     "activeCount": "{{count}}개 활성",
     "download": "다운로드",
-    "upload": "업로드"
+    "upload": "업로드",
+    "zenScore": "Zen Score",
+    "zenScoreCaption": "{{count}} torrents"
   },
   "globalStats": {
     "instances": "인스턴스",
@@ -93,7 +95,9 @@
     "totalDownload": "전체 다운로드",
     "downloadingActive": "{{count}}개 활성 - {{size}} 남음",
     "totalUpload": "전체 업로드",
-    "seedingActive": "{{count}}개 활성 - {{size}} 시드 중"
+    "seedingActive": "{{count}}개 활성 - {{size}} 시드 중",
+    "zenScore": "Zen Score (c411)",
+    "zenScoreCaption": "Average of {{count}} torrents"
   },
   "serverStats": {
     "title": "서버 통계",

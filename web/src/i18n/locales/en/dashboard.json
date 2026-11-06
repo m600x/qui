@@ -83,7 +83,9 @@
     "torrents": "Torrents",
     "activeCount": "{{count}} active",
     "download": "Download",
-    "upload": "Upload"
+    "upload": "Upload",
+    "zenScore": "Zen Score",
+    "zenScoreCaption": "{{count}} torrents"
   },
   "globalStats": {
     "instances": "Instances",
@@ -93,7 +95,9 @@
     "totalDownload": "Total Download",
     "downloadingActive": "{{count}} active - {{size}} remaining",
     "totalUpload": "Total Upload",
-    "seedingActive": "{{count}} active - {{size}} seeding"
+    "seedingActive": "{{count}} active - {{size}} seeding",
+    "zenScore": "Zen Score (c411)",
+    "zenScoreCaption": "Average of {{count}} torrents"
   },
   "serverStats": {
     "title": "Server Statistics",
@@ -138,7 +142,7 @@
       "size": "Size",
       "seeded": "Seeded"
     },
-    "seededTooltip": "Uploaded \u00f7 Content Size \u2014 how many times you've seeded your content",
+    "seededTooltip": "Uploaded ÷ Content Size — how many times you've seeded your content",
     "mergedFrom": "Merged from: {{domains}}",
     "original": "Original: {{domain}}",
     "mergeTooltip": "Merge selected trackers into this group",
@@ -214,7 +218,7 @@
     "noInstances": "No instances configured",
     "getStarted": "Get started by adding your first qBittorrent instance",
     "allDisabled": "All instances are disabled",
-    "enableInstance": "Enable an instance from Settings \u2192 Instances to see dashboard stats.",
+    "enableInstance": "Enable an instance from Settings → Instances to see dashboard stats.",
     "manageInstances": "Manage Instances"
   }
 }

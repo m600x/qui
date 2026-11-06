@@ -942,7 +942,11 @@
       "trackerDown": "Tracker 离线",
       "crossSeeds": "辅种",
       "trackerError": "Tracker 错误"
-    }
+    },
+    "zenScore": "Zen Score",
+    "zenCoef": "Zen coef",
+    "rangeMin": "minimum",
+    "rangeMax": "maximum"
   },
   "statusBar": {
     "selected": "已选 {{count}} 个",
@@ -1477,6 +1481,7 @@
     "timeActive": "活跃时间",
     "seedingTime": "做种时间",
     "zenScore": "Zen Score",
+    "zenCoef": "Zen coef",
     "savePath": "保存路径",
     "completed": "已完成",
     "ratioLimit": "分享率限制",

@@ -379,6 +379,10 @@ type TorrentStats struct {
 	TotalSize          int64 `json:"totalSize"`
 	TotalRemainingSize int64 `json:"totalRemainingSize"`
 	TotalSeedingSize   int64 `json:"totalSeedingSize"`
+
+	// The Zen Scores of the torrents on the c411 tracker. The average is the sum over the count.
+	ZenScoreSum   float64 `json:"zenScoreSum,omitempty"`
+	ZenScoreCount int     `json:"zenScoreCount,omitempty"`
 }
 
 // DuplicateTorrentMatch represents an existing torrent that matches one or more requested hashes.
@@ -1670,6 +1674,8 @@ func (sm *SyncManager) GetTorrentsWithFilters(ctx context.Context, instanceID in
 		}
 	}
 
+	filteredTorrents = sm.applyZenFilters(ctx, instanceID, filteredTorrents, filters)
+
 	log.Trace().
 		Int("instanceID", instanceID).
 		Int("totalCount", len(filteredTorrents)).
@@ -1692,6 +1698,7 @@ func (sm *SyncManager) GetTorrentsWithFilters(ctx context.Context, instanceID in
 
 	// Calculate stats from filtered torrents
 	stats := sm.calculateStats(filteredTorrents)
+	sm.addZenScoreStats(ctx, instanceID, stats, filteredTorrents)
 
 	// Apply pagination to filtered results; limit <= 0 means "unbounded"
 	totalTorrents := len(filteredTorrents)
@@ -2048,6 +2055,8 @@ func mergeTorrentStats(base *TorrentStats, next *TorrentStats) *TorrentStats {
 	base.TotalSize += next.TotalSize
 	base.TotalRemainingSize += next.TotalRemainingSize
 	base.TotalSeedingSize += next.TotalSeedingSize
+	base.ZenScoreSum += next.ZenScoreSum
+	base.ZenScoreCount += next.ZenScoreCount
 
 	return base
 }

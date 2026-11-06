@@ -86,7 +86,7 @@ import type {
 } from "@/types"
 import { useMutation, useQueries, useQueryClient } from "@tanstack/react-query"
 import { Link } from "@tanstack/react-router"
-import { Activity, AlertCircle, AlertTriangle, ArrowDown, ArrowUp, ArrowUpDown, Ban, BrickWallFire, ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Clock, Database, Download, ExternalLink, Eye, EyeOff, Globe, HardDrive, Info, Link2, Minus, MoreVertical, Pencil, Plus, Rabbit, RefreshCcw, Trash2, Turtle, Upload, X, Zap } from "lucide-react"
+import { Activity, AlertCircle, AlertTriangle, ArrowDown, ArrowUp, ArrowUpDown, Ban, BrickWallFire, ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Clock, Database, Download, ExternalLink, Eye, EyeOff, Gauge, Globe, HardDrive, Info, Link2, Minus, MoreVertical, Pencil, Plus, Rabbit, RefreshCcw, Trash2, Turtle, Upload, X, Zap } from "lucide-react"
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
@@ -307,7 +307,16 @@ function useGlobalStats(statsData: DashboardInstanceStats[]) {
       globalRatio = alltimeUl / alltimeDl
     }
 
+    // Average Zen Score of the c411 torrents of all instances
+    const zenScoreSum = statsData.reduce((sum, { stats }) =>
+      sum + (stats?.zenScoreSum || 0), 0)
+    const zenScoreCount = statsData.reduce((sum, { stats }) =>
+      sum + (stats?.zenScoreCount || 0), 0)
+    const zenScoreAverage = zenScoreCount > 0 ? zenScoreSum / zenScoreCount : null
+
     return {
+      zenScoreAverage,
+      zenScoreCount,
       connected,
       total: statsData.length,
       totalTorrents,
@@ -1223,6 +1232,7 @@ function MobileGlobalStatsCard({ globalStats }: { globalStats: GlobalStats }) {
           { Icon: Activity, label: t("mobileOverview.torrents"), value: String(globalStats.totalTorrents), caption: t("mobileOverview.activeCount", { count: globalStats.activeTorrents }) },
           { Icon: Download, label: t("mobileOverview.download"), value: formatSpeedWithUnit(globalStats.totalDownload, speedUnit), caption: t("mobileOverview.activeCount", { count: globalStats.downloadingTorrents }) },
           { Icon: Upload, label: t("mobileOverview.upload"), value: formatSpeedWithUnit(globalStats.totalUpload, speedUnit), caption: t("mobileOverview.activeCount", { count: globalStats.seedingTorrents }) },
+          { Icon: Gauge, label: t("mobileOverview.zenScore"), value: globalStats.zenScoreAverage === null ? "-" : globalStats.zenScoreAverage.toFixed(2), caption: t("mobileOverview.zenScoreCaption", { count: globalStats.zenScoreCount }) },
         ].map(({ Icon, label, value, caption }) => (
           <div key={label} className="min-w-0">
             <div className="flex items-center gap-1.5">
@@ -1296,6 +1306,19 @@ function GlobalStatsCards({ globalStats }: { globalStats: GlobalStats }) {
           <div className="text-2xl font-bold">{formatSpeedWithUnit(globalStats.totalUpload, speedUnit)}</div>
           <p className="text-xs text-muted-foreground">
             {t("globalStats.seedingActive", { count: globalStats.seedingTorrents, size: formatBytes(globalStats.totalSeedingSize) })}
+          </p>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className="text-sm font-medium">{t("globalStats.zenScore")}</CardTitle>
+          <Gauge className="h-4 w-4 text-muted-foreground" />
+        </CardHeader>
+        <CardContent>
+          <div className="text-2xl font-bold">{globalStats.zenScoreAverage === null ? "-" : globalStats.zenScoreAverage.toFixed(2)}</div>
+          <p className="text-xs text-muted-foreground">
+            {t("globalStats.zenScoreCaption", { count: globalStats.zenScoreCount })}
           </p>
         </CardContent>
       </Card>
@@ -3240,7 +3263,7 @@ export function Dashboard() {
                         {/* Mobile: Single combined card */}
                         <MobileGlobalStatsCard globalStats={globalStats} />
                         {/* Tablet/Desktop: Separate cards */}
-                        <div className="hidden sm:grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                        <div className="hidden sm:grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
                           <GlobalStatsCards globalStats={globalStats} />
                         </div>
                       </div>

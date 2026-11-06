@@ -80,6 +80,26 @@ export function computeZenScore(
   return Math.round(score * 100) / 100
 }
 
+// Sizes here are decimal: 1 GB is 1000 MB, the unit the coefficient was set in.
+const COEF_GB = 1e9
+const COEF_REFERENCE_GB = 4
+const COEF_SMALL_BONUS_GB = 0.25
+// Fitted to 1.24 at 25 GB and 1.38 at 60 GB.
+const COEF_LARGE_EXPONENT = 0.118
+
+/**
+ * The Zen coefficient of a size in bytes. Up to 4 GB it is (size + 0.25 GB) / 4.25 GB,
+ * which is 1 at 4 GB. Above that it is (size / 4 GB) ^ 0.118. It grows with the size,
+ * so sorting by size sorts by it.
+ */
+export function computeZenCoef(sizeBytes: number): number {
+  const gb = Math.max(sizeBytes, 0) / COEF_GB
+  if (gb <= COEF_REFERENCE_GB) {
+    return (gb + COEF_SMALL_BONUS_GB) / (COEF_REFERENCE_GB + COEF_SMALL_BONUS_GB)
+  }
+  return (gb / COEF_REFERENCE_GB) ** COEF_LARGE_EXPONENT
+}
+
 /** Category values of one instance, as a synced client setting. */
 export function useZenCategoryValues(instanceId: number) {
   return useClientSetting<ZenCategoryValues>(zenScoreSettingKey(instanceId), {

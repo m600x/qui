@@ -647,6 +647,7 @@
     "timeActive": "Temps actiu",
     "seedingTime": "Temps de sembra",
     "zenScore": "Zen Score",
+    "zenCoef": "Zen coef",
     "savePath": "Camí de desada",
     "completed": "Completat",
     "ratioLimit": "Límit de ràtio",
@@ -842,7 +843,11 @@
       "trackerDown": "Tracker caigut",
       "crossSeeds": "Cross-seed",
       "trackerError": "Error del tracker"
-    }
+    },
+    "zenScore": "Zen Score",
+    "zenCoef": "Zen coef",
+    "rangeMin": "minimum",
+    "rangeMax": "maximum"
   },
   "columnFilter": {
     "filterColumn": "Filtra {{column}}",
