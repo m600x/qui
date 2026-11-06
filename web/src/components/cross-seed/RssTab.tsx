@@ -25,7 +25,7 @@ import {
   useMissingIndexersToast,
   usePatchCrossSeedSettings
 } from "@/hooks/useCrossSeedSettings"
-import { MIN_RSS_INTERVAL_MINUTES, useManualRunCooldown } from "@/hooks/useManualRunCooldown"
+import { MIN_RSS_INTERVAL_MINUTES } from "@/hooks/useManualRunCooldown"
 import { api } from "@/lib/api"
 import { normalizeNumberList } from "@/lib/cross-seed-utils"
 import { rssRunState } from "@/lib/run-state"
@@ -130,7 +130,6 @@ export function RssTab({ settings }: { settings: CrossSeedAutomationSettings }) 
 
   const latestRun: CrossSeedRun | null | undefined = status?.lastRun
   const automationRunning = status?.running ?? false
-  const cooldown = useManualRunCooldown(form.runIntervalMinutes, latestRun?.startedAt)
   const hasTargets = form.targetInstanceIds.length > 0
 
   const runState = rssRunState({
@@ -139,7 +138,7 @@ export function RssTab({ settings }: { settings: CrossSeedAutomationSettings }) 
     running: automationRunning,
     cancelPending: cancelRunMutation.isPending,
     startPending: triggerRunMutation.isPending,
-    cooldown: { active: cooldown.active, minutes: cooldown.enforcedRunIntervalMinutes, remaining: cooldown.display },
+    cooldown: { active: false, minutes: 0, remaining: "" },
   }, t)
 
   const handleTriggerRun = () => {

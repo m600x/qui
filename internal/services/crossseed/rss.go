@@ -178,32 +178,6 @@ func (s *Service) RunAutomation(ctx context.Context, opts AutomationRunOptions) 
 		}
 	}
 
-	if opts.Mode != models.CrossSeedRunModeAuto {
-		intervalMinutes := settings.RunIntervalMinutes
-		if intervalMinutes <= 0 {
-			intervalMinutes = 120
-		}
-		cooldown := max(time.Duration(intervalMinutes)*time.Minute, 30*time.Minute)
-
-		lastRun, err := s.automationStore.GetLatestRun(ctx)
-		if err != nil {
-			return nil, fmt.Errorf("load latest automation run metadata: %w", err)
-		}
-		if lastRun != nil {
-			nextAllowed := lastRun.StartedAt.Add(cooldown)
-			now := time.Now()
-			if now.Before(nextAllowed) {
-				remaining := max(time.Until(nextAllowed), time.Second)
-				remaining = remaining.Round(time.Second)
-				return nil, fmt.Errorf("%w: manual runs limited to one every %d minutes. Try again in %s (after %s)",
-					ErrAutomationCooldownActive,
-					int(cooldown.Minutes()),
-					remaining.String(),
-					nextAllowed.UTC().Format(time.RFC3339))
-			}
-		}
-	}
-
 	// Guard against auto runs when disabled
 	if opts.Mode == models.CrossSeedRunModeAuto && !settings.Enabled {
 		return nil, errors.New("cross-seed automation disabled")
