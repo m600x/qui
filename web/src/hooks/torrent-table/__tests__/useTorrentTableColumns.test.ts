@@ -31,6 +31,7 @@ function makeParams(overrides: Partial<UseTorrentTableColumnsParams> = {}): UseT
     trackerCustomizationLookup: undefined,
     isReadOnly: false,
     t: passthroughT,
+    instanceId: 1,
     sortedTorrents: [],
     ...overrides,
   }
