@@ -248,6 +248,10 @@ export interface TorrentFilters {
   zenScoreMax?: number
   zenCoefMin?: number
   zenCoefMax?: number
+  // Unified view only. duplicatesOnly keeps torrents with a twin in any instance
+  // (same info hash, or same name and size); instanceIds then keeps those of the listed instances.
+  duplicatesOnly?: boolean
+  instanceIds?: number[]
 }
 
 /**

@@ -36,6 +36,9 @@ export function toViewFilters(filters: Partial<TorrentFilters> | undefined): Tor
     const value = filters?.[key]
     if (typeof value === "number" && Number.isFinite(value)) normalized[key] = value
   }
+  // Both are set only when they select something, for the same reason.
+  if (filters?.duplicatesOnly) normalized.duplicatesOnly = true
+  if (filters?.instanceIds?.length) normalized.instanceIds = [...filters.instanceIds].sort((a, b) => a - b)
   return normalized
 }
 
@@ -52,5 +55,7 @@ export const EMPTY_SIDEBAR_FILTERS: TorrentFilters = toViewFilters(undefined)
 export function hasSidebarFilters(filters: Partial<TorrentFilters>): boolean {
   return FILTER_ARRAY_KEYS.some(key => (filters[key]?.length ?? 0) > 0) ||
     FILTER_RANGE_KEYS.some(key => typeof filters[key] === "number") ||
+    Boolean(filters.duplicatesOnly) ||
+    (filters.instanceIds?.length ?? 0) > 0 ||
     Boolean(filters.expr?.trim())
 }

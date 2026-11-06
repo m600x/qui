@@ -946,7 +946,12 @@
     "zenScore": "Zen Score",
     "zenCoef": "Zen coef",
     "rangeMin": "minimum",
-    "rangeMax": "maximum"
+    "rangeMax": "maximum",
+    "duplicates": "Duplicates",
+    "duplicatesToggle": "Only duplicates",
+    "duplicatesHint": "Same info hash, or same name and size, in any instance.",
+    "instances": "Instance",
+    "instancesAll": "All instances"
   },
   "statusBar": {
     "selected": "已選 {{count}} 個",

@@ -2004,6 +2004,11 @@ func (sm *SyncManager) GetCrossInstanceTorrentsWithFilters(ctx context.Context, 
 		return nil, ctx.Err()
 	}
 
+	if filters.DuplicatesOnly || len(filters.InstanceIDs) > 0 {
+		allTorrents = narrowCrossInstanceRows(allTorrents, filters.DuplicatesOnly, filters.InstanceIDs)
+		totalCount = len(allTorrents)
+	}
+
 	// An empty sort column sorts by name, as an unknown column does.
 	if IsZenSortColumn(sort) {
 		sm.sortCrossInstanceByZenScore(ctx, sort, allTorrents, order == "desc")

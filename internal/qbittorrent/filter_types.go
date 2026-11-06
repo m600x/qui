@@ -23,6 +23,13 @@ type FilterOptions struct {
 	ZenCoefMin  *float64 `json:"zenCoefMin,omitempty"`
 	ZenCoefMax  *float64 `json:"zenCoefMax,omitempty"`
 
+	// Unified view only. DuplicatesOnly keeps the rows that have a twin in any
+	// instance: the same info hash, or the exact name and size. InstanceIDs then
+	// keeps only the rows of those instances. The twin search runs before the
+	// instance selection, so a row shown can be a duplicate of one not shown.
+	DuplicatesOnly bool  `json:"duplicatesOnly,omitempty"`
+	InstanceIDs    []int `json:"instanceIds,omitempty"`
+
 	HideTrackerPasskeys bool `json:"-"`
 }
 

@@ -10156,6 +10156,14 @@ components:
           items:
             type: string
           description: Array of torrent hashes to explicitly include
+        duplicatesOnly:
+          type: boolean
+          description: Unified view only. Keep torrents that have a twin in any instance (same info hash, or same name and size).
+        instanceIds:
+          type: array
+          items:
+            type: integer
+          description: Unified view only. Keep torrents of these instances, after duplicates are found across all instances in scope.
 
     BackupRun:
       type: object

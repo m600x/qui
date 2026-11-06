@@ -42,8 +42,7 @@ import { usePersistedCompactViewState } from "@/hooks/usePersistedCompactViewSta
 import { usePersistedShowEmptyState } from "@/hooks/usePersistedShowEmptyState"
 import { buildTrackerCustomizationMaps, trackerGroupKey, useTrackerCustomizations } from "@/hooks/useTrackerCustomizations"
 import { useTrackerIcons } from "@/hooks/useTrackerIcons"
-import { EMPTY_SIDEBAR_FILTERS, hasSidebarFilters } from "@/lib/filter-views"
-import { getIncognitoCategories, getIncognitoTags, getIncognitoTrackers, getLinuxCount, useIncognitoMode } from "@/lib/incognito"
+import { EMPTY_SIDEBAR_FILTERS, hasSidebarFilters } from "@/lib/filter-views"import { getIncognitoCategories, getIncognitoTags, getIncognitoTrackers, getLinuxCount, useIncognitoMode } from "@/lib/incognito"
 import { useSpreadsheetDisguise } from "@/lib/spreadsheet-disguise"
 import { TRACKER_HEALTH_DISPLAY } from "@/lib/torrent-table/row-display"
 import { cn, formatBytes, takeTurns } from "@/lib/utils"
@@ -75,6 +74,7 @@ import { useTranslation } from "react-i18next"
 import { CategoryTree } from "./CategoryTree"
 import { FilterClearButton } from "./FilterClearButton"
 import { FilterViewsSection } from "./FilterViewsSection"
+import { DuplicateInstanceFilters } from "./DuplicateInstanceFilters"
 import { ZenRangeFilter } from "./ZenRangeFilter"
 import {
   CreateCategoryDialog,
@@ -3057,6 +3057,19 @@ const FilterSidebarComponent = ({
                 </div>
               </AccordionContent>
             </AccordionItem>
+
+            {/* Duplicate detection and instance selector, Unified view only */}
+            {!isConcreteInstanceScope && (
+              <DuplicateInstanceFilters
+                duplicatesOnly={selectedFilters.duplicatesOnly ?? false}
+                onDuplicatesChange={(duplicatesOnly) => applyFilterChange({ ...selectedFilters, duplicatesOnly: duplicatesOnly || undefined })}
+                instances={(instances ?? []).filter(instance => instance.isActive && (!instanceIds || instanceIds.includes(instance.id)))}
+                selectedInstanceIds={selectedFilters.instanceIds ?? []}
+                onInstancesChange={(ids) => applyFilterChange({ ...selectedFilters, instanceIds: ids.length > 0 ? ids : undefined })}
+                triggerClassName={accordionTriggerClass}
+                contentClassName={accordionContentClass}
+              />
+            )}
 
             {/* Zen Score and Zen coef ranges */}
             <ZenRangeFilter
