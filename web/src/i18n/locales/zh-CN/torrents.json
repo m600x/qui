@@ -1476,6 +1476,7 @@
     "amountLeft": "剩余",
     "timeActive": "活跃时间",
     "seedingTime": "做种时间",
+    "zenScore": "Zen Score",
     "savePath": "保存路径",
     "completed": "已完成",
     "ratioLimit": "分享率限制",
@@ -1602,5 +1603,14 @@
         "add_failed": "添加种子失败。"
       }
     }
+  },
+  "zenScore": {
+    "menuItem": "Zen Score settings",
+    "title": "Zen Score settings",
+    "description": "The category value is the base of the score. A category left at 1.0 uses the default value.",
+    "categoryValue": "Zen Score value for category {{category}}",
+    "noCategories": "This instance has no categories.",
+    "save": "Save",
+    "cancel": "Cancel"
   }
 }

@@ -22,6 +22,7 @@ import {
 } from "@/lib/incognito"
 import { formatTimestamp as formatStoredTimestamp, isNeverCompletedTimestamp } from "@/lib/dateTimeUtils"
 import { formatSpeedWithUnit, type SpeedUnit } from "@/lib/speedUnits"
+import { computeZenScore, type ZenCategoryValues } from "@/lib/zen-score"
 import { formatReannounceIn, getStateLabel } from "@/lib/torrent-state-utils"
 import {
   extractTrackerHost,
@@ -301,7 +302,10 @@ interface CreateColumnsParams {
   showInstanceColumn?: boolean
   viewMode?: TableViewMode
   trackerCustomizationLookup?: TrackerCustomizationLookup
+  getZenCategoryValues?: (torrent: Torrent) => ZenCategoryValues
 }
+
+const NO_ZEN_CATEGORY_VALUES: ZenCategoryValues = {}
 
 export const createColumns = ({
   incognitoMode,
@@ -314,6 +318,7 @@ export const createColumns = ({
   showInstanceColumn = false,
   viewMode = "normal",
   trackerCustomizationLookup,
+  getZenCategoryValues = () => NO_ZEN_CATEGORY_VALUES,
 }: CreateColumnsParams, t: TFunction): TorrentTableColumnDef[] => {
   // Badge padding classes based on view mode
   const badgePadding = viewMode === "dense" ? "px-1.5 py-0" : ""
@@ -873,6 +878,16 @@ export const createColumns = ({
         )
       },
       size: 250,
+    },
+    {
+      id: "zen_score",
+      accessorFn: (torrent) => computeZenScore(torrent, getZenCategoryValues(torrent)),
+      header: t("tableColumns.zenScore"),
+      cell: ({ row }) => {
+        const score = computeZenScore(row.original, getZenCategoryValues(row.original))
+        return <span className="text-sm overflow-hidden whitespace-nowrap">{score === null ? "-" : score.toFixed(2)}</span>
+      },
+      size: 100,
     },
     {
       accessorKey: "save_path",

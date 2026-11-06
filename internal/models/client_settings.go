@@ -5,6 +5,8 @@ package models
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 
 	"github.com/autobrr/qui/internal/dbinterface"
 )
@@ -37,6 +39,18 @@ func (s *ClientSettingsStore) GetAll(ctx context.Context) (map[string]string, er
 		settings[key] = value
 	}
 	return settings, rows.Err()
+}
+
+// Get returns one stored setting. ok is false when the key was never stored.
+func (s *ClientSettingsStore) Get(ctx context.Context, key string) (value string, ok bool, err error) {
+	err = s.db.QueryRowContext(ctx, `SELECT value FROM client_settings WHERE key = ?`, key).Scan(&value)
+	if errors.Is(err, sql.ErrNoRows) {
+		return "", false, nil
+	}
+	if err != nil {
+		return "", false, err
+	}
+	return value, true, nil
 }
 
 // SetMany upserts the given settings atomically, leaving keys not in the map

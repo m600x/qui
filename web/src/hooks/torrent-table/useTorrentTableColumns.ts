@@ -7,7 +7,8 @@ import { createColumns, type TableViewMode } from "@/components/torrents/Torrent
 import type { TorrentTableColumnDef } from "@/components/torrents/tanstackTableFeatures"
 import type { SpeedUnit } from "@/lib/speedUnits"
 import type { TrackerCustomizationLookup } from "@/lib/tracker-customizations"
-import type { Torrent } from "@/types"
+import { readZenCategoryValues, useZenScoreSettingsVersion } from "@/lib/zen-score"
+import type { CrossInstanceTorrent, Torrent } from "@/types"
 import type { TFunction } from "i18next"
 import { useMemo } from "react"
 
@@ -32,6 +33,8 @@ export interface UseTorrentTableColumnsParams {
   trackerCustomizationLookup?: TrackerCustomizationLookup
   isReadOnly: boolean
   t: TFunction
+  // The instance whose Zen Score category values apply; unified rows use their own instance.
+  instanceId: number
   // Data (for the duplicate-identity counts that feed the table's getRowId)
   sortedTorrents: Torrent[]
 }
@@ -66,8 +69,11 @@ export function useTorrentTableColumns({
   trackerCustomizationLookup,
   isReadOnly,
   t,
+  instanceId,
   sortedTorrents,
 }: UseTorrentTableColumnsParams): TorrentTableColumns {
+  const zenScoreSettingsVersion = useZenScoreSettingsVersion()
+
   // Memoize columns to avoid unnecessary recalculations
   const columns = useMemo(
     () => createColumns({
@@ -88,8 +94,10 @@ export function useTorrentTableColumns({
       showInstanceColumn: isUnifiedView && isCrossInstanceEndpoint,
       viewMode: desktopViewMode as TableViewMode,
       trackerCustomizationLookup,
+      getZenCategoryValues: (torrent) => readZenCategoryValues((torrent as Partial<CrossInstanceTorrent>).instanceId ?? instanceId),
     }, t),
-    [incognitoMode, speedUnit, trackerIcons, formatTimestamp, handleSelectAll, isSelectAllChecked, isSelectAllIndeterminate, isTorrentSelected, handleCheckboxPointerDown, handleCheckboxChange, instanceMaxRatio, supportsTrackerHealth, isUnifiedView, isCrossInstanceEndpoint, desktopViewMode, trackerCustomizationLookup, isReadOnly, t]
+    // zenScoreSettingsVersion rebuilds the columns when the category values change.
+    [zenScoreSettingsVersion, instanceId, incognitoMode, speedUnit, trackerIcons, formatTimestamp, handleSelectAll, isSelectAllChecked, isSelectAllIndeterminate, isTorrentSelected, handleCheckboxPointerDown, handleCheckboxChange, instanceMaxRatio, supportsTrackerHealth, isUnifiedView, isCrossInstanceEndpoint, desktopViewMode, trackerCustomizationLookup, isReadOnly, t]
   )
 
   const torrentIdentityCounts = useMemo(() => {

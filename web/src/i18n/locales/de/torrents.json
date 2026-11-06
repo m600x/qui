@@ -1566,6 +1566,7 @@
     "amountLeft": "Verbleibend",
     "timeActive": "Aktive Zeit",
     "seedingTime": "Seeding-Zeit",
+    "zenScore": "Zen Score",
     "savePath": "Speicherpfad",
     "completed": "Abgeschlossen",
     "ratioLimit": "Ratio-Limit",
@@ -1679,5 +1680,14 @@
         "add_failed": "Der Torrent konnte nicht hinzugefügt werden."
       }
     }
+  },
+  "zenScore": {
+    "menuItem": "Zen Score settings",
+    "title": "Zen Score settings",
+    "description": "The category value is the base of the score. A category left at 1.0 uses the default value.",
+    "categoryValue": "Zen Score value for category {{category}}",
+    "noCategories": "This instance has no categories.",
+    "save": "Save",
+    "cancel": "Cancel"
   }
 }

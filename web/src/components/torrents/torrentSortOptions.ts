@@ -35,6 +35,7 @@ export const TORRENT_SORT_OPTIONS = [
   { value: "amount_left", labelKey: "tableColumns.amountLeft" },
   { value: "time_active", labelKey: "tableColumns.timeActive" },
   { value: "seeding_time", labelKey: "tableColumns.seedingTime" },
+  { value: "zen_score", labelKey: "tableColumns.zenScore" },
   { value: "save_path", labelKey: "tableColumns.savePath" },
   { value: "completed", labelKey: "tableColumns.completed" },
   { value: "ratio_limit", labelKey: "tableColumns.ratioLimit" },

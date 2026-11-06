@@ -25,6 +25,7 @@ const DEFAULT_COLUMNS: ReadonlyArray<{ id: string; visible: boolean }> = [
   { id: "eta", visible: true },
   { id: "ratio", visible: true },
   { id: "popularity", visible: true },
+  { id: "zen_score", visible: false },
   { id: "category", visible: true },
   { id: "tags", visible: true },
   { id: "added_on", visible: true },

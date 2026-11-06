@@ -40,6 +40,7 @@ import { InstancePreferencesDialog } from "../instances/preferences/InstancePref
 import { torrentTableFeatures, type TorrentRow, type TorrentTableColumnDef } from "./tanstackTableFeatures"
 import { type TableViewMode } from "./TorrentTableColumns"
 import { TorrentListEmptyState } from "./TorrentListEmptyState"
+import { ZenScoreSettingsDialog } from "./ZenScoreSettingsDialog"
 import { type TorrentSortOptionValue } from "./torrentSortOptions"
 
 import { Badge } from "@/components/ui/badge"
@@ -47,6 +48,7 @@ import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
@@ -224,6 +226,7 @@ export const TorrentTableOptimized = memo(function TorrentTableOptimized({
 
   // Instance preferences dialog state
   const [preferencesOpen, setPreferencesOpen] = useState(false)
+  const [zenScoreDialogOpen, setZenScoreDialogOpen] = useState(false)
 
   const [incognitoMode, setIncognitoMode] = useIncognitoMode()
   const { t } = useTranslation("torrents")
@@ -611,6 +614,7 @@ export const TorrentTableOptimized = memo(function TorrentTableOptimized({
     trackerCustomizationLookup,
     isReadOnly,
     t,
+    instanceId,
     sortedTorrents,
   })
 
@@ -1235,6 +1239,14 @@ export const TorrentTableOptimized = memo(function TorrentTableOptimized({
                               sensors={sensors}
                               onDragEnd={onDragEnd}
                             />
+                            {instanceId > 0 && (
+                              <>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem onSelect={() => setZenScoreDialogOpen(true)}>
+                                  {t("zenScore.menuItem")}
+                                </DropdownMenuItem>
+                              </>
+                            )}
                           </DropdownMenuContent>
                         </DropdownMenu>
                       </>
@@ -1244,6 +1256,15 @@ export const TorrentTableOptimized = memo(function TorrentTableOptimized({
 
                 return container ? createPortal(actions, container) : actions
               })()}
+
+              {instanceId > 0 && (
+                <ZenScoreSettingsDialog
+                  instanceId={instanceId}
+                  categories={Object.keys(availableCategories).sort((a, b) => a.localeCompare(b))}
+                  open={zenScoreDialogOpen}
+                  onOpenChange={setZenScoreDialogOpen}
+                />
+              )}
 
               {instanceId > 0 && (
                 <AddTorrentDialog

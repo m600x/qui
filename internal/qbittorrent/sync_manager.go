@@ -516,6 +516,8 @@ type SyncManager struct {
 
 	// Tracker customization store for custom display names in sorting
 	trackerCustomizationStore TrackerCustomizationLister
+	// zenScoreSettings holds the category values of the Zen Score sort.
+	zenScoreSettings ZenScoreSettings
 	// Cached tracker display name map (domain -> displayName), refreshed periodically
 	trackerDisplayNameCache *ttlcache.Cache[string, map[string]string]
 
@@ -1681,7 +1683,11 @@ func (sm *SyncManager) GetTorrentsWithFilters(ctx context.Context, instanceID in
 
 	summary := SummaryRequested(ctx)
 	if sort != "" && !summary {
-		sm.sortTorrents(filteredTorrents, sort, order == "desc", trackerHealthSupported, cachedHealth)
+		if sort == ZenScoreColumn {
+			sm.sortTorrentsByZenScore(ctx, instanceID, filteredTorrents, order == "desc")
+		} else {
+			sm.sortTorrents(filteredTorrents, sort, order == "desc", trackerHealthSupported, cachedHealth)
+		}
 	}
 
 	// Calculate stats from filtered torrents
@@ -1970,7 +1976,11 @@ func (sm *SyncManager) GetCrossInstanceTorrentsWithFilters(ctx context.Context, 
 	}
 
 	// An empty sort column sorts by name, as an unknown column does.
-	sm.sortCrossInstanceTorrents(allTorrents, sort, order == "desc")
+	if sort == ZenScoreColumn {
+		sm.sortCrossInstanceByZenScore(ctx, allTorrents, order == "desc")
+	} else {
+		sm.sortCrossInstanceTorrents(allTorrents, sort, order == "desc")
+	}
 
 	// Apply pagination
 	// Clamp offset to valid range [0, len(allTorrents)]

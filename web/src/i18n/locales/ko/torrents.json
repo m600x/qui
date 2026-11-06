@@ -1490,6 +1490,7 @@
     "amountLeft": "남음",
     "timeActive": "활성 시간",
     "seedingTime": "시딩 시간",
+    "zenScore": "Zen Score",
     "savePath": "저장 경로",
     "completed": "완료됨",
     "ratioLimit": "비율 제한",
@@ -1602,5 +1603,14 @@
         "add_failed": "토렌트를 추가하지 못했습니다."
       }
     }
+  },
+  "zenScore": {
+    "menuItem": "Zen Score settings",
+    "title": "Zen Score settings",
+    "description": "The category value is the base of the score. A category left at 1.0 uses the default value.",
+    "categoryValue": "Zen Score value for category {{category}}",
+    "noCategories": "This instance has no categories.",
+    "save": "Save",
+    "cancel": "Cancel"
   }
 }

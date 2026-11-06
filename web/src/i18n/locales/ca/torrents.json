@@ -646,6 +646,7 @@
     "amountLeft": "Restant",
     "timeActive": "Temps actiu",
     "seedingTime": "Temps de sembra",
+    "zenScore": "Zen Score",
     "savePath": "Camí de desada",
     "completed": "Completat",
     "ratioLimit": "Límit de ràtio",
@@ -1679,5 +1680,14 @@
       "rejectedOne": "S'ha rebutjat 1 fitxer (no és un fitxer .torrent)",
       "rejectedMany": "S'han rebutjat {{count}} fitxers (no són fitxers .torrent)"
     }
+  },
+  "zenScore": {
+    "menuItem": "Zen Score settings",
+    "title": "Zen Score settings",
+    "description": "The category value is the base of the score. A category left at 1.0 uses the default value.",
+    "categoryValue": "Zen Score value for category {{category}}",
+    "noCategories": "This instance has no categories.",
+    "save": "Save",
+    "cancel": "Cancel"
   }
 }

@@ -21,7 +21,8 @@ import { getApiBaseUrl } from "@/lib/base-url"
  * always means "never synced".
  */
 
-const CHANGE_EVENT = "qui-client-setting-changed"
+export const CLIENT_SETTING_CHANGE_EVENT = "qui-client-setting-changed"
+const CHANGE_EVENT = CLIENT_SETTING_CHANGE_EVENT
 const FLUSH_DELAY_MS = 800
 
 export const TORRENT_VIEW_MODE_KEYS = {
@@ -68,6 +69,7 @@ const SYNCED_PREFIXES = [
   "qui-column-sizing:",
   "qui-stretch-name-column:",
   "qui-column-filters-",
+  "qui-zen-score-categories:",
   "qui-collapsed-categories-",
   "qui-filters-",
   "qui:torrent-mobile-sort:",
