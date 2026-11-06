@@ -380,9 +380,13 @@ type TorrentStats struct {
 	TotalRemainingSize int64 `json:"totalRemainingSize"`
 	TotalSeedingSize   int64 `json:"totalSeedingSize"`
 
-	// The Zen Scores of the torrents on the c411 tracker. The average is the sum over the count.
-	ZenScoreSum   float64 `json:"zenScoreSum,omitempty"`
-	ZenScoreCount int     `json:"zenScoreCount,omitempty"`
+	// The seeded torrents on the c411 tracker: the sums of their Zen Score, of
+	// their Zen coefficient, and of each Zen Score times its own coefficient.
+	// An average is a sum over the count.
+	ZenScoreSum     float64 `json:"zenScoreSum,omitempty"`
+	ZenCoefSum      float64 `json:"zenCoefSum,omitempty"`
+	ZenScoreCoefSum float64 `json:"zenScoreCoefSum,omitempty"`
+	ZenScoreCount   int     `json:"zenScoreCount,omitempty"`
 }
 
 // DuplicateTorrentMatch represents an existing torrent that matches one or more requested hashes.
@@ -2056,6 +2060,8 @@ func mergeTorrentStats(base *TorrentStats, next *TorrentStats) *TorrentStats {
 	base.TotalRemainingSize += next.TotalRemainingSize
 	base.TotalSeedingSize += next.TotalSeedingSize
 	base.ZenScoreSum += next.ZenScoreSum
+	base.ZenCoefSum += next.ZenCoefSum
+	base.ZenScoreCoefSum += next.ZenScoreCoefSum
 	base.ZenScoreCount += next.ZenScoreCount
 
 	return base

@@ -268,6 +268,10 @@ function mergeCachedInstanceData(
   return next
 }
 
+function formatZenAverage(value: number | null): string {
+  return value === null ? "-" : value.toFixed(2)
+}
+
 // Shared hook for computing global stats across all instances
 function useGlobalStats(statsData: DashboardInstanceStats[]) {
   return useMemo(() => {
@@ -313,9 +317,17 @@ function useGlobalStats(statsData: DashboardInstanceStats[]) {
     const zenScoreCount = statsData.reduce((sum, { stats }) =>
       sum + (stats?.zenScoreCount || 0), 0)
     const zenScoreAverage = zenScoreCount > 0 ? zenScoreSum / zenScoreCount : null
+    const zenCoefSum = statsData.reduce((sum, { stats }) =>
+      sum + (stats?.zenCoefSum || 0), 0)
+    const zenCoefAverage = zenScoreCount > 0 ? zenCoefSum / zenScoreCount : null
+    const zenScoreCoefSum = statsData.reduce((sum, { stats }) =>
+      sum + (stats?.zenScoreCoefSum || 0), 0)
+    const zenScoreCoefAverage = zenScoreCount > 0 ? zenScoreCoefSum / zenScoreCount : null
 
     return {
       zenScoreAverage,
+      zenCoefAverage,
+      zenScoreCoefAverage,
       zenScoreCount,
       connected,
       total: statsData.length,
@@ -1232,7 +1244,9 @@ function MobileGlobalStatsCard({ globalStats }: { globalStats: GlobalStats }) {
           { Icon: Activity, label: t("mobileOverview.torrents"), value: String(globalStats.totalTorrents), caption: t("mobileOverview.activeCount", { count: globalStats.activeTorrents }) },
           { Icon: Download, label: t("mobileOverview.download"), value: formatSpeedWithUnit(globalStats.totalDownload, speedUnit), caption: t("mobileOverview.activeCount", { count: globalStats.downloadingTorrents }) },
           { Icon: Upload, label: t("mobileOverview.upload"), value: formatSpeedWithUnit(globalStats.totalUpload, speedUnit), caption: t("mobileOverview.activeCount", { count: globalStats.seedingTorrents }) },
-          { Icon: Gauge, label: t("mobileOverview.zenScore"), value: globalStats.zenScoreAverage === null ? "-" : globalStats.zenScoreAverage.toFixed(2), caption: t("mobileOverview.zenScoreCaption", { count: globalStats.zenScoreCount }) },
+          { Icon: Gauge, label: t("mobileOverview.zenScore"), value: formatZenAverage(globalStats.zenScoreAverage), caption: t("mobileOverview.zenScoreCaption", { count: globalStats.zenScoreCount }) },
+          { Icon: Gauge, label: t("mobileOverview.zenCoef"), value: formatZenAverage(globalStats.zenCoefAverage), caption: t("mobileOverview.zenScoreCaption", { count: globalStats.zenScoreCount }) },
+          { Icon: Gauge, label: t("mobileOverview.zenScoreCoef"), value: formatZenAverage(globalStats.zenScoreCoefAverage), caption: t("mobileOverview.zenScoreCaption", { count: globalStats.zenScoreCount }) },
         ].map(({ Icon, label, value, caption }) => (
           <div key={label} className="min-w-0">
             <div className="flex items-center gap-1.5">
@@ -1316,7 +1330,33 @@ function GlobalStatsCards({ globalStats }: { globalStats: GlobalStats }) {
           <Gauge className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">{globalStats.zenScoreAverage === null ? "-" : globalStats.zenScoreAverage.toFixed(2)}</div>
+          <div className="text-2xl font-bold">{formatZenAverage(globalStats.zenScoreAverage)}</div>
+          <p className="text-xs text-muted-foreground">
+            {t("globalStats.zenScoreCaption", { count: globalStats.zenScoreCount })}
+          </p>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className="text-sm font-medium">{t("globalStats.zenCoef")}</CardTitle>
+          <Gauge className="h-4 w-4 text-muted-foreground" />
+        </CardHeader>
+        <CardContent>
+          <div className="text-2xl font-bold">{formatZenAverage(globalStats.zenCoefAverage)}</div>
+          <p className="text-xs text-muted-foreground">
+            {t("globalStats.zenScoreCaption", { count: globalStats.zenScoreCount })}
+          </p>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className="text-sm font-medium">{t("globalStats.zenScoreCoef")}</CardTitle>
+          <Gauge className="h-4 w-4 text-muted-foreground" />
+        </CardHeader>
+        <CardContent>
+          <div className="text-2xl font-bold">{formatZenAverage(globalStats.zenScoreCoefAverage)}</div>
           <p className="text-xs text-muted-foreground">
             {t("globalStats.zenScoreCaption", { count: globalStats.zenScoreCount })}
           </p>
@@ -3263,7 +3303,7 @@ export function Dashboard() {
                         {/* Mobile: Single combined card */}
                         <MobileGlobalStatsCard globalStats={globalStats} />
                         {/* Tablet/Desktop: Separate cards */}
-                        <div className="hidden sm:grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+                        <div className="hidden sm:grid gap-4 sm:grid-cols-2 lg:grid-cols-4 2xl:grid-cols-7">
                           <GlobalStatsCards globalStats={globalStats} />
                         </div>
                       </div>

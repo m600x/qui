@@ -175,6 +175,9 @@ export interface TorrentStats {
   totalSeedingSize?: number
   // Zen Scores of the torrents on the c411 tracker; the average is the sum over the count.
   zenScoreSum?: number
+  zenCoefSum?: number
+  // The sum of each seeded torrent's Zen Score times its own Zen coefficient.
+  zenScoreCoefSum?: number
   zenScoreCount?: number
 }
 

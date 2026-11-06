@@ -85,7 +85,9 @@
     "download": "다운로드",
     "upload": "업로드",
     "zenScore": "Zen Score",
-    "zenScoreCaption": "{{count}} torrents"
+    "zenScoreCaption": "{{count}} torrents",
+    "zenCoef": "Zen coef",
+    "zenScoreCoef": "Score × coef"
   },
   "globalStats": {
     "instances": "인스턴스",
@@ -97,7 +99,9 @@
     "totalUpload": "전체 업로드",
     "seedingActive": "{{count}}개 활성 - {{size}} 시드 중",
     "zenScore": "Zen Score (c411)",
-    "zenScoreCaption": "Average of {{count}} torrents"
+    "zenScoreCaption": "Average of {{count}} torrents",
+    "zenCoef": "Zen coef (c411)",
+    "zenScoreCoef": "Zen Score × coef (c411)"
   },
   "serverStats": {
     "title": "서버 통계",

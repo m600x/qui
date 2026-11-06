@@ -124,10 +124,16 @@ func TestAddZenScoreStats(t *testing.T) {
 	// 1 + 0.1 and 0.5 + 0.35; the unseeded and the other tracker's torrent do not count.
 	assert.Equal(t, 2, stats.ZenScoreCount)
 	assert.InDelta(t, 1.95, stats.ZenScoreSum, 1e-9)
+	// Both torrents are 0 bytes, so each has the coefficient 0.25 / 4.25.
+	coef := 0.25 / 4.25
+	assert.InDelta(t, 2*coef, stats.ZenCoefSum, 1e-9)
+	assert.InDelta(t, 1.1*coef+0.85*coef, stats.ZenScoreCoefSum, 1e-9)
 
-	merged := mergeTorrentStats(&TorrentStats{ZenScoreSum: 1, ZenScoreCount: 1}, stats)
+	merged := mergeTorrentStats(&TorrentStats{ZenScoreSum: 1, ZenCoefSum: 1, ZenScoreCoefSum: 1, ZenScoreCount: 1}, stats)
 	assert.Equal(t, 3, merged.ZenScoreCount)
 	assert.InDelta(t, 2.95, merged.ZenScoreSum, 1e-9)
+	assert.InDelta(t, 1+2*coef, merged.ZenCoefSum, 1e-9)
+	assert.InDelta(t, 1+1.95*coef, merged.ZenScoreCoefSum, 1e-9)
 }
 
 func TestZenCoef(t *testing.T) {

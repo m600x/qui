@@ -183,9 +183,10 @@ func (sm *SyncManager) matchesZenStatsTracker(t *qbt.Torrent, displayNames map[s
 	return false
 }
 
-// addZenScoreStats adds the sum and count of the Zen Scores of the torrents of
-// one instance that match zenStatsTracker. The dashboard divides the totals of
-// all instances.
+// addZenScoreStats adds the sums and the count of the seeded torrents of one
+// instance that match zenStatsTracker: their Zen Scores, their Zen
+// coefficients, and each score times its own coefficient. The dashboard divides
+// the totals of all instances.
 func (sm *SyncManager) addZenScoreStats(ctx context.Context, instanceID int, stats *TorrentStats, torrents []qbt.Torrent) {
 	var displayNames map[string]string
 	var categoryValues map[string]float64
@@ -204,7 +205,10 @@ func (sm *SyncManager) addZenScoreStats(ctx context.Context, instanceID int, sta
 			categoryValues = sm.zenCategoryValues(ctx, instanceID)
 		}
 		if score, ok := ZenScore(t, categoryValues); ok {
+			coef := ZenCoef(t.Size)
 			stats.ZenScoreSum += score
+			stats.ZenCoefSum += coef
+			stats.ZenScoreCoefSum += score * coef
 			stats.ZenScoreCount++
 		}
 	}
