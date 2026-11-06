@@ -105,7 +105,7 @@ describe("RssTab save", () => {
   it("rejects an interval under the minimum before it sends anything", async () => {
     const { container } = renderTab()
     const interval = await mountedInterval(container)
-    fireEvent.change(interval, { target: { value: "5" } })
+    fireEvent.change(interval, { target: { value: "0" } })
     fireEvent.click(screen.getByRole("button", { name: "automation.saveSettings" }))
 
     expect(screen.getByText("validation.minInterval")).toBeTruthy()
