@@ -46,8 +46,8 @@ import { useEffect, useMemo, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
 
-const MIN_SEEDED_SEARCH_INTERVAL_SECONDS = 60
-const MIN_GAZELLE_ONLY_SEARCH_INTERVAL_SECONDS = 5  // Gazelle-only seeded search: still be polite; per-torrent work can trigger multiple API calls
+const MIN_SEEDED_SEARCH_INTERVAL_SECONDS = 1
+const MIN_GAZELLE_ONLY_SEARCH_INTERVAL_SECONDS = 1
 const MIN_SEEDED_SEARCH_COOLDOWN_MINUTES = 720
 
 function isOpsRedTorznabIndexer(indexerName: string, indexerID: string, baseURL: string) {

@@ -129,7 +129,7 @@ const (
 	// Forgiveness ceiling for byte-budget auto-resume: even when every missing
 	// file is an irrelevant sidecar, never auto-resume above this much missing data.
 	irrelevantResumeForgivenessCapBytes   = int64(200) << 20
-	minSearchIntervalSecondsTorznab       = 60
+	minSearchIntervalSecondsTorznab       = 1
 	minSearchCooldownMinutes              = 720
 	maxCompletionCheckingAttempts         = 3
 	torznabCrossSeedSearchLimit           = 100

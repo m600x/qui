@@ -33,7 +33,7 @@ type dedupCacheEntry struct {
 
 // minSearchIntervalSecondsGazelleOnly is the shortest wait between two
 // candidates of a Library Scan that searches only RED/OPS. Tests shorten it.
-var minSearchIntervalSecondsGazelleOnly = 5
+var minSearchIntervalSecondsGazelleOnly = 1
 
 // SearchRunOptions configures how the library search automation operates.
 type SearchRunOptions struct {
