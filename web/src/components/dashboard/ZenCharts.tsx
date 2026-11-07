@@ -51,8 +51,9 @@ function ChartCard({ title, description, children, className }: { title: string;
         {description && <CardDescription>{description}</CardDescription>}
       </CardHeader>
       <CardContent>
+        {/* A card in a grid has no room for the full-width minimum, so the chart scales down instead of scrolling. */}
         <div className="overflow-x-auto">
-          <div className="min-w-[640px]">{children}</div>
+          <div className={className ? undefined : "min-w-[640px]"}>{children}</div>
         </div>
       </CardContent>
     </Card>
@@ -334,7 +335,8 @@ export function ZenCharts({ stats }: { stats: Array<TorrentStats | null | undefi
         <p className="text-sm text-muted-foreground">{t("zenCharts.subtitle", { count: data.count })}</p>
       </div>
 
-      <ChartCard title={t("zenCharts.scoreTitle")} description={t("zenCharts.scoreDescription")}>
+      <div className="grid gap-4 lg:grid-cols-3">
+      <ChartCard className="min-w-0" title={t("zenCharts.scoreTitle")} description={t("zenCharts.scoreDescription")}>
         <BarChart
           values={data.scoreHist}
           labels={scoreLabels}
@@ -345,7 +347,7 @@ export function ZenCharts({ stats }: { stats: Array<TorrentStats | null | undefi
         />
       </ChartCard>
 
-      <ChartCard title={t("zenCharts.coefTitle")} description={t("zenCharts.coefDescription")}>
+      <ChartCard className="min-w-0" title={t("zenCharts.coefTitle")} description={t("zenCharts.coefDescription")}>
         <BarChart
           values={data.coefHist}
           labels={coefLabels}
@@ -356,7 +358,7 @@ export function ZenCharts({ stats }: { stats: Array<TorrentStats | null | undefi
         />
       </ChartCard>
 
-      <ChartCard title={t("zenCharts.productTitle")} description={t("zenCharts.productDescription")}>
+      <ChartCard className="min-w-0" title={t("zenCharts.productTitle")} description={t("zenCharts.productDescription")}>
         <BarChart
           values={data.productHist}
           labels={productLabels}
@@ -366,6 +368,7 @@ export function ZenCharts({ stats }: { stats: Array<TorrentStats | null | undefi
           ariaLabel={t("zenCharts.productTitle")}
         />
       </ChartCard>
+      </div>
 
       <ChartCard title={t("zenCharts.whatIfTitle")} description={t("zenCharts.whatIfDescription")}>
         <WhatIfChart
