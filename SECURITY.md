@@ -18,4 +18,3 @@ Include the qui version, the steps to reproduce the issue, and the effect on a u
 ## What happens next
 
 We reply to your report and tell you if we accept it. When we release a fix, we publish a GitHub security advisory. If you want credit in the advisory, tell us the name to use.
-
