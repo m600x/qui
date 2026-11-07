@@ -296,7 +296,7 @@ function PartsBar({ parts, total }: { parts: Array<{ label: string; value: numbe
 }
 
 /** Charts of how the Zen Score, the Zen coefficient and their product are spread over the c411 torrents. */
-export function ZenCharts({ stats }: { stats: Array<TorrentStats | null | undefined> }) {
+export function ZenCharts({ stats, payout }: { stats: Array<TorrentStats | null | undefined>; payout?: React.ReactNode }) {
   const { t } = useTranslation("dashboard")
   const data = useMemo(() => aggregateZenDistribution(stats), [stats])
 
@@ -335,8 +335,20 @@ export function ZenCharts({ stats }: { stats: Array<TorrentStats | null | undefi
         <p className="text-sm text-muted-foreground">{t("zenCharts.subtitle", { count: data.count })}</p>
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-3">
-      <ChartCard className="min-w-0" title={t("zenCharts.scoreTitle")} description={t("zenCharts.scoreDescription")}>
+      {/* Two rows of two: the payout and the product, then the score and the coef. */}
+      <div className="grid gap-4 lg:grid-cols-2">
+      {payout}
+      <ChartCard className="min-w-0 lg:order-2" title={t("zenCharts.productTitle")} description={t("zenCharts.productDescription")}>
+        <BarChart
+          values={data.productHist}
+          labels={productLabels}
+          color="var(--chart-1)"
+          marker={{ position: bucketPosition(averageProduct, ZEN_PRODUCT_EDGES), label: average(averageProduct) }}
+          tooltip={histogramTooltip(productLabels, data.productHist)}
+          ariaLabel={t("zenCharts.productTitle")}
+        />
+      </ChartCard>
+      <ChartCard className="min-w-0 lg:order-3" title={t("zenCharts.scoreTitle")} description={t("zenCharts.scoreDescription")}>
         <BarChart
           values={data.scoreHist}
           labels={scoreLabels}
@@ -347,7 +359,7 @@ export function ZenCharts({ stats }: { stats: Array<TorrentStats | null | undefi
         />
       </ChartCard>
 
-      <ChartCard className="min-w-0" title={t("zenCharts.coefTitle")} description={t("zenCharts.coefDescription")}>
+      <ChartCard className="min-w-0 lg:order-4" title={t("zenCharts.coefTitle")} description={t("zenCharts.coefDescription")}>
         <BarChart
           values={data.coefHist}
           labels={coefLabels}
@@ -358,16 +370,6 @@ export function ZenCharts({ stats }: { stats: Array<TorrentStats | null | undefi
         />
       </ChartCard>
 
-      <ChartCard className="min-w-0" title={t("zenCharts.productTitle")} description={t("zenCharts.productDescription")}>
-        <BarChart
-          values={data.productHist}
-          labels={productLabels}
-          color="var(--chart-1)"
-          marker={{ position: bucketPosition(averageProduct, ZEN_PRODUCT_EDGES), label: average(averageProduct) }}
-          tooltip={histogramTooltip(productLabels, data.productHist)}
-          ariaLabel={t("zenCharts.productTitle")}
-        />
-      </ChartCard>
       </div>
 
       <ChartCard title={t("zenCharts.whatIfTitle")} description={t("zenCharts.whatIfDescription")}>

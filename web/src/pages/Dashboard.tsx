@@ -3309,8 +3309,7 @@ export function Dashboard() {
                         <div className="hidden sm:grid gap-4 sm:grid-cols-2 lg:grid-cols-4 2xl:grid-cols-7">
                           <GlobalStatsCards globalStats={globalStats} />
                         </div>
-                        <ZenPayoutCard stats={zenStats} />
-                        <ZenCharts stats={zenStats} />
+                        <ZenCharts stats={zenStats} payout={<ZenPayoutCard stats={zenStats} />} />
                       </div>
                     )
                   case "instances":
